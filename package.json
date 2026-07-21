@@ -1,0 +1,29 @@
+{
+	"name": "htmlto-link-obsidian",
+	"version": "0.1.0",
+	"description": "Publish Obsidian notes as beautiful share pages on htmlto.link",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"version": "node version-bump.mjs && git add manifest.json versions.json"
+	},
+	"keywords": [
+		"obsidian",
+		"obsidian-plugin",
+		"htmlto.link",
+		"markdown",
+		"publish",
+		"share"
+	],
+	"author": "htmlto.link",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^16.11.6",
+		"builtin-modules": "3.3.0",
+		"esbuild": "0.25.5",
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"typescript": "5.8.3"
+	}
+}

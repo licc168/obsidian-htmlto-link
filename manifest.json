@@ -1,0 +1,10 @@
+{
+	"id": "htmlto-link",
+	"name": "Htmlto.link Publisher",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "一键将当前笔记发布为 htmlto.link 精美分享页，并复制公开链接。",
+	"author": "htmlto.link",
+	"authorUrl": "https://htmlto.link",
+	"isDesktopOnly": false
+}
