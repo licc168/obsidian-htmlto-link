@@ -40,8 +40,8 @@ export interface HtmltoLinkSettings {
 export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	apiBaseUrl: "https://htmlto.link",
 	apiToken: "",
-	templateId: "memo",
-	themeClass: "bright-mode",
+	templateId: "plain",
+	themeClass: "",
 	cardWidth: 440,
 	language: "auto",
 	copyLinkOnSuccess: true,
@@ -88,6 +88,7 @@ export const TEMPLATE_OPTIONS: Array<{ id: string; nameKey: string }> = [
 	{ id: "organic", nameKey: "tplOrganic" },
 	{ id: "playfulgeometric", nameKey: "tplPlayfulGeometric" },
 	{ id: "professional", nameKey: "tplProfessional" },
+	{ id: "plain", nameKey: "tplPlain" },
 ];
 
 /**

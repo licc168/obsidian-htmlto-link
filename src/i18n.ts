@@ -132,6 +132,7 @@ const dict = {
     tplOrganic: "Wabi-sabi Ceramic",
     tplPlayfulGeometric: "Playful Geometric",
     tplProfessional: "Professional",
+    tplPlain: "Plain",
 
     // theme labels (UI only; API uses value)
     themeBright: "Bright",
@@ -272,6 +273,7 @@ const dict = {
     tplOrganic: "侘寂陶艺",
     tplPlayfulGeometric: "活泼几何",
     tplProfessional: "专业商务",
+    tplPlain: "简洁",
 
     // theme labels
     themeBright: "高亮",
