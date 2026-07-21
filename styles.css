@@ -1,5 +1,73 @@
-/* Htmlto.link Publisher — optional styles */
+/* Htmlto.link Publisher */
 
 .htmlto-link-notice {
 	white-space: pre-wrap;
+}
+
+.htmlto-link-publish-modal .htmlto-link-publish-actions,
+.htmlto-link-success-modal .htmlto-link-publish-actions {
+	display: flex;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+.htmlto-link-publish-modal .htmlto-link-publish-actions button,
+.htmlto-link-success-modal .htmlto-link-publish-actions button {
+	padding: 6px 14px;
+}
+
+.htmlto-link-publish-modal .htmlto-link-success-label,
+.htmlto-link-success-modal .htmlto-link-success-label {
+	font-size: 0.85em;
+	opacity: 0.75;
+	margin: 12px 0 6px;
+}
+
+.htmlto-link-publish-modal .htmlto-link-success-url-row,
+.htmlto-link-success-modal .htmlto-link-success-url-row {
+	display: flex;
+	width: 100%;
+}
+
+.htmlto-link-publish-modal .htmlto-link-success-url,
+.htmlto-link-success-modal .htmlto-link-success-url {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 8px 10px;
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-primary-alt);
+	color: var(--text-normal);
+	font-family: var(--font-monospace);
+	font-size: 0.9em;
+	cursor: text;
+}
+
+.htmlto-link-publish-modal .htmlto-link-success-status,
+.htmlto-link-success-modal .htmlto-link-success-status {
+	margin-top: 8px;
+	min-height: 1.2em;
+}
+
+.htmlto-link-publish-modal .htmlto-link-publish-status {
+	margin-top: 12px;
+	min-height: 1.2em;
+}
+
+.htmlto-link-publish-modal .htmlto-link-publish-error {
+	color: var(--text-error);
+}
+
+.htmlto-link-publish-modal .htmlto-link-publish-guest-note,
+.htmlto-link-success-modal .htmlto-link-publish-guest-note {
+	margin: 4px 0 4px;
+	padding: 8px 10px;
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	font-size: 0.85em;
+	line-height: 1.4;
 }

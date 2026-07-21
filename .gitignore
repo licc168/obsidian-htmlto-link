@@ -18,5 +18,8 @@ main.js
 # obsidian
 data.json
 
+# local test vault (contains personal notes)
+Vault/
+
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store
