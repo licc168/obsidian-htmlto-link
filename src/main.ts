@@ -2,22 +2,24 @@ import { MarkdownView, Plugin } from "obsidian";
 import { DEFAULT_SETTINGS, type HtmltoLinkSettings } from "./constants";
 import { HtmltoLinkSettingTab } from "./settings";
 import { publishActiveNote } from "./publish";
+import { initI18n, t } from "./i18n";
 
 export default class HtmltoLinkPlugin extends Plugin {
 	settings!: HtmltoLinkSettings;
 
 	async onload() {
 		await this.loadSettings();
+		initI18n(this.app);
 
 		// 左侧功能区图标
-		this.addRibbonIcon("share", "Publish to htmlto.link", () => {
+		this.addRibbonIcon("share", t("commandPublish"), () => {
 			void publishActiveNote(this);
 		});
 
-		// 命令：发布当前笔记
+		// 命令：分享当前笔记（会弹模板/宽度选择）
 		this.addCommand({
 			id: "publish-current-note",
-			name: "Publish current note to htmlto.link",
+			name: t("commandPublish"),
 			checkCallback: (checking: boolean) => {
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (!view) return false;
@@ -28,10 +30,10 @@ export default class HtmltoLinkPlugin extends Plugin {
 			},
 		});
 
-		// 命令：复制上次设置说明（快速打开设置）
+		// 命令：打开设置
 		this.addCommand({
 			id: "open-htmlto-link-settings",
-			name: "Open htmlto.link settings",
+			name: t("commandSettings"),
 			callback: () => {
 				// @ts-ignore - Obsidian 内部 API，打开设置到本插件
 				this.app.setting.open();
@@ -50,11 +52,12 @@ export default class HtmltoLinkPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<HtmltoLinkSettings>,
-		);
+		const data = (await this.loadData()) as Partial<HtmltoLinkSettings> | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
+		// 确保 noteShares 始终是对象（旧版本可能没有该字段）
+		if (!this.settings.noteShares || typeof this.settings.noteShares !== "object") {
+			this.settings.noteShares = {};
+		}
 	}
 
 	async saveSettings() {

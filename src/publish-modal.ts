@@ -6,6 +6,7 @@ import {
 	hasMultiThemes,
 	resolveThemeClassForTemplate,
 } from "./constants";
+import { t } from "./i18n";
 
 export interface PublishOptions {
 	templateId: string;
@@ -75,9 +76,9 @@ export class PublishFlowModal extends Modal {
 			return;
 		}
 
-		contentEl.createEl("h2", { text: "发布到 htmlto.link" });
+		contentEl.createEl("h2", { text: t("publishTitle") });
 		contentEl.createEl("p", {
-			text: `笔记：${this.noteTitle}`,
+			text: t("notePrefix") + this.noteTitle,
 			cls: "setting-item-description",
 		});
 
@@ -93,8 +94,8 @@ export class PublishFlowModal extends Modal {
 		const themes = getTemplateThemes(this.draft.templateId);
 
 		new Setting(contentEl)
-			.setName("模板")
-			.setDesc("默认选中上次使用的模板，可随时改")
+			.setName(t("templateName"))
+			.setDesc(t("templateDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of TEMPLATE_OPTIONS) {
 					dropdown.addOption(item.id, item.name);
@@ -116,8 +117,8 @@ export class PublishFlowModal extends Modal {
 
 		if (multiTheme) {
 			new Setting(contentEl)
-				.setName("主题")
-				.setDesc("该模板支持多种主题配色")
+				.setName(t("themeName"))
+				.setDesc(t("themeDesc"))
 				.addDropdown((dropdown) => {
 					for (const item of themes) {
 						dropdown.addOption(item.value, item.label);
@@ -138,8 +139,8 @@ export class PublishFlowModal extends Modal {
 		}
 
 		new Setting(contentEl)
-			.setName("卡片宽度")
-			.setDesc("默认选中上次使用的宽度，可随时改")
+			.setName(t("cardWidthName"))
+			.setDesc(t("modalCardWidthDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of CARD_WIDTH_OPTIONS) {
 					dropdown.addOption(String(item.value), item.label);
@@ -165,9 +166,9 @@ export class PublishFlowModal extends Modal {
 			cls: "htmlto-link-publish-status setting-item-description",
 		});
 		if (this.phase === "publishing") {
-			statusEl.setText("正在发布，请稍候…");
+			statusEl.setText(t("publishing"));
 		} else if (this.phase === "error") {
-			statusEl.setText(`发布失败：${this.errorMessage}`);
+			statusEl.setText(t("publishFailedPrefix") + this.errorMessage);
 			statusEl.addClass("htmlto-link-publish-error");
 		}
 
@@ -176,13 +177,13 @@ export class PublishFlowModal extends Modal {
 		});
 
 		const cancelBtn = actions.createEl("button", {
-			text: "取消",
+			text: t("cancel"),
 		});
 		cancelBtn.disabled = this.phase === "publishing";
 		cancelBtn.addEventListener("click", () => this.close());
 
 		const publishBtn = actions.createEl("button", {
-			text: this.phase === "publishing" ? "发布中…" : "发布",
+			text: this.phase === "publishing" ? t("publishingBtn") : t("publishBtn"),
 			cls: "mod-cta",
 		});
 		publishBtn.disabled = this.phase === "publishing";
@@ -244,10 +245,10 @@ function renderSuccessContent(
 	info: PublishSuccessInfo,
 	onClose: () => void,
 ) {
-	const title = info.updated ? "已更新分享" : "发布成功";
+	const title = info.updated ? t("updatedTitle") : t("successTitle");
 	contentEl.createEl("h2", { text: title });
 	contentEl.createEl("p", {
-		text: `笔记：${info.noteTitle}`,
+		text: t("notePrefix") + info.noteTitle,
 		cls: "setting-item-description",
 	});
 
@@ -259,7 +260,7 @@ function renderSuccessContent(
 	}
 
 	contentEl.createEl("div", {
-		text: "分享链接",
+		text: t("shareLinkLabel"),
 		cls: "htmlto-link-success-label",
 	});
 
@@ -279,31 +280,31 @@ function renderSuccessContent(
 		cls: "htmlto-link-success-status setting-item-description",
 	});
 	if (info.autoCopied) {
-		statusEl.setText("链接已自动复制到剪贴板");
+		statusEl.setText(t("autoCopied"));
 	} else {
-		statusEl.setText("点击下方按钮复制链接");
+		statusEl.setText(t("clickToCopy"));
 	}
 
 	const actions = contentEl.createDiv({
 		cls: "htmlto-link-publish-actions",
 	});
 
-	const openBtn = actions.createEl("button", { text: "打开链接" });
+	const openBtn = actions.createEl("button", { text: t("openLink") });
 	openBtn.addEventListener("click", () => {
 		window.open(info.url, "_blank");
 	});
 
 	const copyBtn = actions.createEl("button", {
-		text: info.autoCopied ? "已复制" : "复制链接",
+		text: info.autoCopied ? t("copied") : t("copyLink"),
 		cls: "mod-cta",
 	});
 
 	const setCopied = () => {
-		copyBtn.setText("已复制");
-		statusEl.setText("链接已复制到剪贴板");
+		copyBtn.setText(t("copied"));
+		statusEl.setText(t("autoCopied"));
 		window.setTimeout(() => {
 			if (copyBtn.isConnected) {
-				copyBtn.setText("复制链接");
+				copyBtn.setText(t("copyLink"));
 			}
 		}, 2000);
 	};
@@ -312,7 +313,7 @@ function renderSuccessContent(
 		try {
 			await navigator.clipboard.writeText(info.url);
 			setCopied();
-			new Notice("链接已复制");
+			new Notice(t("noticeCopied"));
 		} catch {
 			urlInput.focus();
 			urlInput.select();
@@ -320,17 +321,17 @@ function renderSuccessContent(
 				const ok = document.execCommand("copy");
 				if (ok) {
 					setCopied();
-					new Notice("链接已复制");
+					new Notice(t("noticeCopied"));
 				} else {
-					statusEl.setText("复制失败，请手动全选链接后 Ctrl+C");
+					statusEl.setText(t("copyFailed"));
 				}
 			} catch {
-				statusEl.setText("复制失败，请手动全选链接后 Ctrl+C");
+				statusEl.setText(t("copyFailed"));
 			}
 		}
 	});
 
-	const closeBtn = actions.createEl("button", { text: "关闭" });
+	const closeBtn = actions.createEl("button", { text: t("close") });
 	closeBtn.addEventListener("click", () => onClose());
 }
 

@@ -9,6 +9,7 @@ import {
 	resolveThemeClassForTemplate,
 	type HtmltoLinkSettings,
 } from "./constants";
+import { t } from "./i18n";
 
 export { DEFAULT_SETTINGS };
 export type { HtmltoLinkSettings };
@@ -31,15 +32,15 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			this.plugin.settings.themeClass,
 		);
 
-		containerEl.createEl("h2", { text: "Htmlto.link Publisher" });
+		containerEl.createEl("h2", { text: t("settingsTitle") });
 		containerEl.createEl("p", {
-			text: "将当前 Obsidian 笔记一键发布为 htmlto.link 精美分享页。",
+			text: t("settingsDesc"),
 			cls: "setting-item-description",
 		});
 
 		new Setting(containerEl)
-			.setName("API 地址")
-			.setDesc("默认 https://htmlto.link，自建部署可改成你的域名")
+			.setName(t("apiUrlName"))
+			.setDesc(t("apiUrlDesc"))
 			.addText((text) =>
 				text
 					.setPlaceholder("https://htmlto.link")
@@ -53,13 +54,11 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("API Token")
-			.setDesc(
-				"留空则作为游客发布，分享链接仅保留 24 小时。填入网站「设置 → API Token」可让链接归属你的账号并享受更长的有效期。",
-			)
+			.setName(t("apiTokenName"))
+			.setDesc(t("apiTokenDesc"))
 			.addText((text) =>
 				text
-					.setPlaceholder("粘贴你的 API Token（可留空）")
+					.setPlaceholder(t("apiTokenName"))
 					.setValue(this.plugin.settings.apiToken)
 					.onChange(async (value) => {
 						this.plugin.settings.apiToken = value
@@ -70,8 +69,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("默认模板")
-			.setDesc("发布时使用的卡片模板")
+			.setName(t("defaultTemplateName"))
+			.setDesc(t("defaultTemplateDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of TEMPLATE_OPTIONS) {
 					dropdown.addOption(item.id, item.name);
@@ -96,8 +95,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 
 		if (multiTheme) {
 			new Setting(containerEl)
-				.setName("默认主题")
-				.setDesc("当前模板支持多种主题配色")
+				.setName(t("defaultThemeName"))
+				.setDesc(t("defaultThemeDesc"))
 				.addDropdown((dropdown) => {
 					for (const item of themes) {
 						dropdown.addOption(item.value, item.label);
@@ -113,8 +112,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 		// 无多主题时不显示主题选项
 
 		new Setting(containerEl)
-			.setName("卡片宽度")
-			.setDesc("分享页卡片宽度（像素）")
+			.setName(t("cardWidthName"))
+			.setDesc(t("cardWidthDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of CARD_WIDTH_OPTIONS) {
 					dropdown.addOption(String(item.value), item.label);
@@ -128,10 +127,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName("发布时选择模板和宽度")
-			.setDesc(
-				"开启后每次发布弹出选择框；选过一次会自动记住，下次默认选中上次的模板和宽度",
-			)
+			.setName(t("showOptionsName"))
+			.setDesc(t("showOptionsDesc"))
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.showOptionsOnPublish)
@@ -142,10 +139,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("发布后自动复制链接")
-			.setDesc(
-				"成功弹窗打开时，是否同时自动复制链接（弹窗里仍可再点「复制链接」）",
-			)
+			.setName(t("copyOnSuccessName"))
+			.setDesc(t("copyOnSuccessDesc"))
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.copyLinkOnSuccess)
@@ -156,8 +151,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("发布后打开浏览器")
-			.setDesc("成功后在系统浏览器中打开分享页")
+			.setName(t("openBrowserName"))
+			.setDesc(t("openBrowserDesc"))
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.openInBrowser)
@@ -168,8 +163,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("在笔记末尾追加链接")
-			.setDesc("发布成功后，在当前笔记底部追加分享链接")
+			.setName(t("appendLinkName"))
+			.setDesc(t("appendLinkDesc"))
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.appendLinkToNote)
@@ -179,22 +174,14 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 					}),
 			);
 
-		containerEl.createEl("h3", { text: "说明" });
+		containerEl.createEl("h3", { text: t("tipsTitle") });
 		const tips = containerEl.createEl("ul");
 		const hasToken = this.plugin.settings.apiToken.trim().length > 0;
 		tips.createEl("li", {
-			text: hasToken
-				? "已填写 API Token：分享链接归属于你的账号，按套餐享受更长有效期。"
-				: "未填写 Token 时走游客模式：分享链接仅保留 24 小时。",
+			text: hasToken ? t("tipTokenFilled") : t("tipTokenGuest"),
 		});
-		tips.createEl("li", {
-			text: "仅「备忘录 / 波普艺术 / 线圈笔记本」支持多主题，其他模板为固定样式。",
-		});
-		tips.createEl("li", {
-			text: "本地图片暂不自动上传，建议使用外链图或先上传到图床。",
-		});
-		tips.createEl("li", {
-			text: "命令面板搜索「Publish to htmlto.link」即可发布当前笔记。",
-		});
+		tips.createEl("li", { text: t("tipThemes") });
+		tips.createEl("li", { text: t("tipImages") });
+		tips.createEl("li", { text: t("tipCommand") });
 	}
 }

@@ -1,9 +1,9 @@
 {
 	"id": "htmlto-link",
-	"name": "Htmlto.link Publisher",
+	"name": "Share Page",
 	"version": "0.1.0",
 	"minAppVersion": "1.5.0",
-	"description": "一键将当前笔记发布为 htmlto.link 精美分享页，并复制公开链接。",
+	"description": "Instantly share a note as a beautiful webpage and copy the public link.",
 	"author": "htmlto.link",
 	"authorUrl": "https://htmlto.link",
 	"isDesktopOnly": false

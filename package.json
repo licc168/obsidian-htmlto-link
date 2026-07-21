@@ -1,7 +1,7 @@
 {
 	"name": "htmlto-link-obsidian",
 	"version": "0.1.0",
-	"description": "Publish Obsidian notes as beautiful share pages on htmlto.link",
+	"description": "Instantly share an Obsidian note as a beautiful webpage and copy the public link",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

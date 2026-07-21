@@ -1,13 +1,13 @@
-# Htmlto.link Publisher（Obsidian 插件）
+# Share Page（Obsidian 插件）
 
-一键将当前 Obsidian 笔记发布为 [htmlto.link](https://htmlto.link) 精美分享页，并复制公开链接。
+一键将当前 Obsidian 笔记分享为 [htmlto.link](https://htmlto.link) 精美网页，并复制公开链接。
 
 ## 功能
 
-- 命令面板：`Publish current note to htmlto.link`
-- 左侧功能区「分享」图标一键发布
+- 命令面板：`Share current note`
+- 左侧功能区「分享」图标一键分享
 - 可选模板（备忘录 / 波普艺术 / 中国传统 / 线圈笔记本…）
-- 发布成功后：复制链接 / 打开浏览器 / 追加到笔记末尾
+- 分享成功后：复制链接 / 打开浏览器 / 追加到笔记末尾
 - 可配置 API 地址（默认 `https://htmlto.link`，支持自建）
 
 ## 安装（开发版）
@@ -37,13 +37,13 @@ npm run build
 - `manifest.json`
 - `styles.css`
 
-4. 设置 → 社区插件 → 启用 **Htmlto.link Publisher**
+4. 设置 → 社区插件 → 启用 **Share Page**
 
 ### 3. 使用
 
 1. 打开任意 Markdown 笔记
-2. `Ctrl/Cmd + P` → 搜索 `Publish current note to htmlto.link`
-3. 等待提示「已发布并复制链接」
+2. `Ctrl/Cmd + P` → 搜索 `Share current note`
+3. 等待提示「分享成功」并复制链接
 4. 浏览器打开链接即可查看
 
 ## 设置项

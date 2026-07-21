@@ -11,6 +11,7 @@ import {
 	type PublishOptions,
 	type PublishSuccessInfo,
 } from "./publish-modal";
+import { t, timeLocale } from "./i18n";
 
 /**
  * 去掉 YAML frontmatter，避免把元数据渲染进分享页
@@ -99,17 +100,17 @@ async function doPublish(
 	let guestNote: string | undefined;
 	if (result.expiresAt) {
 		const expire = new Date(result.expiresAt);
-		const expireText = expire.toLocaleString("zh-CN", {
+		const expireText = expire.toLocaleString(timeLocale(), {
 			month: "2-digit",
 			day: "2-digit",
 			hour: "2-digit",
 			minute: "2-digit",
 		});
 		guestNote = result.temporary
-			? `游客发布：链接将在 ${expireText} 过期（保留 24 小时）。填写 API Token 可归属你的账号并延长有效期。`
-			: `链接将在 ${expireText} 过期（已绑定你的账号）。`;
+			? t("guestNoteExpiryGuest", { time: expireText })
+			: t("guestNoteExpiryUser", { time: expireText });
 	} else if (result.temporary) {
-		guestNote = "游客发布：链接仅保留 24 小时。填写 API Token 可延长有效期。";
+		guestNote = t("guestNoteGuestSimple");
 	}
 
 	if (slug && updateToken) {
@@ -151,13 +152,13 @@ async function doPublish(
 export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void> {
 	const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
 	if (!view) {
-		new Notice("请先打开一篇 Markdown 笔记");
+		new Notice(t("errNoView"));
 		return;
 	}
 
 	const file = view.file;
 	if (!file) {
-		new Notice("当前没有可发布的笔记文件");
+		new Notice(t("errNoFile"));
 		return;
 	}
 
@@ -166,7 +167,7 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 	const markdown = prepareMarkdown(raw);
 
 	if (!markdown) {
-		new Notice("笔记内容为空，无法发布");
+		new Notice(t("errEmpty"));
 		return;
 	}
 
@@ -183,7 +184,7 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 	if (plugin.settings.showOptionsOnPublish) {
 		const guestWarning = plugin.settings.apiToken.trim()
 			? undefined
-			: "未填写 API Token，本次为游客发布：分享链接仅保留 24 小时。可在插件设置中填写 Token 延长有效期。";
+			: t("guestWarning");
 		openPublishFlow(
 			plugin.app,
 			initial,
@@ -195,7 +196,7 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 	}
 
 	// 关闭选择弹窗：直接发布，成功后弹出结果框
-	const notice = new Notice("正在发布到 htmlto.link…", 0);
+	const notice = new Notice(t("publishingNotice"), 0);
 	try {
 		const info = await doPublish(plugin, file, markdown, initial);
 		notice.hide();
@@ -203,7 +204,7 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 	} catch (err) {
 		notice.hide();
 		const message = err instanceof Error ? err.message : String(err);
-		new Notice(`发布失败：${message}`, 10000);
+		new Notice(t("publishFailed") + message, 10000);
 		console.error("[htmlto-link] publish failed", err);
 	}
 }
@@ -214,7 +215,7 @@ async function appendShareLink(
 	url: string,
 ): Promise<void> {
 	const stamp = new Date().toISOString().slice(0, 19).replace("T", " ");
-	const block = `\n\n---\n\n> 分享链接（${stamp}）：[${url}](${url})\n`;
+	const block = `\n\n---\n\n> ${t("appendStamp", { time: stamp })}[${url}](${url})\n`;
 	await plugin.app.vault.process(file, (data) => {
 		if (data.includes(url)) return data;
 		return data + block;

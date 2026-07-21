@@ -1,5 +1,15 @@
 import { requestUrl } from "obsidian";
 import type { HtmltoLinkSettings } from "./constants";
+import { t } from "./i18n";
+
+/** 区分网络错误与业务错误，便于上层决定是否回退到新建 */
+class ApiError extends Error {
+	isNetwork: boolean;
+	constructor(message: string, isNetwork = false) {
+		super(message);
+		this.isNetwork = isNetwork;
+	}
+}
 
 export interface CreateShareRequest {
 	/** Markdown 正文（服务端字段名是 content） */
@@ -79,7 +89,7 @@ async function requestJson(
 		});
 	} catch (err) {
 		const message = err instanceof Error ? err.message : String(err);
-		throw new Error(`网络请求失败：${message}`);
+		throw new ApiError(t("networkFailed") + message, true);
 	}
 
 	let data: CreateShareResponse = {};
@@ -88,7 +98,7 @@ async function requestJson(
 			? res.json
 			: JSON.parse(res.text || "{}")) as CreateShareResponse;
 	} catch {
-		throw new Error(`服务器返回非 JSON（HTTP ${res.status}）`);
+		throw new ApiError(t("invalidJson") + res.status + ")", false);
 	}
 
 	return { status: res.status, data };
@@ -101,7 +111,7 @@ function finalizeResponse(
 ): CreateShareResponse {
 	const ok = Boolean(data.success || data.ok);
 	if (status >= 400 || !ok) {
-		throw new Error(data.error || `发布失败（HTTP ${status}）`);
+		throw new ApiError(data.error || t("httpFailed") + status + ")", false);
 	}
 
 	if (!data.url) {
@@ -109,7 +119,7 @@ function finalizeResponse(
 			// 与网站 buildPublicShareUrl 一致：https://htmlto.link/{slug}
 			data.url = `${base}/${data.slug}`;
 		} else {
-			throw new Error("发布成功但未返回链接");
+			throw new ApiError(t("noUrl"), false);
 		}
 	}
 
@@ -153,8 +163,7 @@ export async function createSharePage(
 			}
 		} catch (err) {
 			// 网络类错误直接抛出；业务失败则新建
-			const message = err instanceof Error ? err.message : String(err);
-			if (message.includes("网络请求失败")) {
+			if (err instanceof ApiError && err.isNetwork) {
 				throw err;
 			}
 			// fall through
