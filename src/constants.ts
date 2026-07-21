@@ -6,17 +6,22 @@ export interface NoteShareRecord {
 	updatedAt: string;
 }
 
+/** 插件界面语言：auto 跟随 Obsidian，en/zh 手动指定 */
+export type PluginLanguage = "auto" | "en" | "zh";
+
 export interface HtmltoLinkSettings {
 	/** 服务端根地址，默认 https://htmlto.link */
 	apiBaseUrl: string;
-	/** 模板 id，对应网站 imageTextTemplates */
+	/** 模板 id，对应网站 imageTextTemplates（接口只认 id，与显示名无关） */
 	templateId: string;
-	/** 主题 class，可为空 */
+	/** 主题 class，可为空（接口只认 value，与显示名无关） */
 	themeClass: string;
 	/** 卡片宽度 */
 	cardWidth: number;
 	/** API Token（留空则走游客接口，链接仅保留 24 小时） */
 	apiToken: string;
+	/** 插件界面语言 */
+	language: PluginLanguage;
 	/** 成功后复制链接 */
 	copyLinkOnSuccess: boolean;
 	/** 成功后打开浏览器 */
@@ -38,6 +43,7 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	templateId: "memo",
 	themeClass: "bright-mode",
 	cardWidth: 440,
+	language: "auto",
 	copyLinkOnSuccess: true,
 	openInBrowser: false,
 	appendLinkToNote: false,
@@ -45,71 +51,74 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	noteShares: {},
 };
 
-/** 与网站 lib/constants.ts 中 imageTextTemplates 对齐 */
-export const TEMPLATE_OPTIONS: Array<{ id: string; name: string }> = [
-	{ id: "memo", name: "备忘录" },
-	{ id: "popart", name: "波普艺术" },
-	{ id: "traditionalchinese", name: "中国传统" },
-	{ id: "coilnotebook", name: "线圈笔记本" },
-	{ id: "purpleticket", name: "紫色小红书" },
-	{ id: "bytedance", name: "字节范" },
-	{ id: "warm", name: "温暖柔和" },
-	{ id: "alibaba", name: "阿里橙" },
-	{ id: "notebook", name: "笔记本" },
-	{ id: "darktech", name: "黑色科技" },
-	{ id: "fairytale", name: "儿童童话" },
-	{ id: "boardgamestyle", name: "桌游风格" },
-	{ id: "cyberpunk", name: "赛博朋克" },
-	{ id: "glassmorphism", name: "玻璃拟态" },
-	{ id: "neonglow", name: "霓虹发光" },
-	{ id: "vintagenewspaper", name: "复古报纸" },
-	{ id: "handwrittennote", name: "手写笔记" },
-	{ id: "vintagemap", name: "古旧地图" },
-	{ id: "blueprint", name: "蓝图技术" },
-	{ id: "botanical", name: "植物图鉴" },
-	{ id: "sketch", name: "手绘涂鸦" },
-	{ id: "terminal", name: "终端命令行" },
-	{ id: "retro", name: "复古Win95" },
-	{ id: "ayulight", name: "Ayu暖光" },
-	{ id: "bauhaus", name: "包豪斯" },
-	{ id: "greensimple", name: "清新绿" },
-	{ id: "maximalism", name: "极繁主义" },
-	{ id: "neobrutalism", name: "新粗野主义" },
-	{ id: "newsprint", name: "报纸印刷" },
-	{ id: "organic", name: "侘寂陶艺" },
-	{ id: "playfulgeometric", name: "活泼几何" },
-	{ id: "professional", name: "专业商务" },
+/**
+ * 与网站 imageTextTemplates 对齐。
+ * id 会原样传给 API；nameKey 仅用于 UI 多语言显示。
+ */
+export const TEMPLATE_OPTIONS: Array<{ id: string; nameKey: string }> = [
+	{ id: "memo", nameKey: "tplMemo" },
+	{ id: "popart", nameKey: "tplPopart" },
+	{ id: "traditionalchinese", nameKey: "tplTraditionalChinese" },
+	{ id: "coilnotebook", nameKey: "tplCoilNotebook" },
+	{ id: "purpleticket", nameKey: "tplPurpleTicket" },
+	{ id: "bytedance", nameKey: "tplBytedance" },
+	{ id: "warm", nameKey: "tplWarm" },
+	{ id: "alibaba", nameKey: "tplAlibaba" },
+	{ id: "notebook", nameKey: "tplNotebook" },
+	{ id: "darktech", nameKey: "tplDarktech" },
+	{ id: "fairytale", nameKey: "tplFairytale" },
+	{ id: "boardgamestyle", nameKey: "tplBoardgame" },
+	{ id: "cyberpunk", nameKey: "tplCyberpunk" },
+	{ id: "glassmorphism", nameKey: "tplGlassmorphism" },
+	{ id: "neonglow", nameKey: "tplNeonglow" },
+	{ id: "vintagenewspaper", nameKey: "tplVintageNewspaper" },
+	{ id: "handwrittennote", nameKey: "tplHandwritten" },
+	{ id: "vintagemap", nameKey: "tplVintageMap" },
+	{ id: "blueprint", nameKey: "tplBlueprint" },
+	{ id: "botanical", nameKey: "tplBotanical" },
+	{ id: "sketch", nameKey: "tplSketch" },
+	{ id: "terminal", nameKey: "tplTerminal" },
+	{ id: "retro", nameKey: "tplRetro" },
+	{ id: "ayulight", nameKey: "tplAyulight" },
+	{ id: "bauhaus", nameKey: "tplBauhaus" },
+	{ id: "greensimple", nameKey: "tplGreensimple" },
+	{ id: "maximalism", nameKey: "tplMaximalism" },
+	{ id: "neobrutalism", nameKey: "tplNeobrutalism" },
+	{ id: "newsprint", nameKey: "tplNewsprint" },
+	{ id: "organic", nameKey: "tplOrganic" },
+	{ id: "playfulgeometric", nameKey: "tplPlayfulGeometric" },
+	{ id: "professional", nameKey: "tplProfessional" },
 ];
 
 /**
- * 与网站 lib/constants.ts 中 templateThemes 对齐
- * 只有部分模板支持多主题
+ * 与网站 templateThemes 对齐。
+ * value 会原样传给 API；labelKey 仅用于 UI 多语言显示。
  */
 export const TEMPLATE_THEMES: Record<
 	string,
-	Array<{ label: string; value: string }>
+	Array<{ value: string; labelKey: string }>
 > = {
 	memo: [
-		{ label: "高亮", value: "bright-mode" },
-		{ label: "暗黑", value: "dark-mode" },
+		{ value: "bright-mode", labelKey: "themeBright" },
+		{ value: "dark-mode", labelKey: "themeDark" },
 	],
 	popart: [
-		{ label: "糖果色", value: "candy-mode" },
-		{ label: "薄荷绿", value: "mint-mode" },
-		{ label: "紫色", value: "purple-mode" },
-		{ label: "黄色", value: "yellow-mode" },
-		{ label: "热辣红", value: "hot-red-mode" },
-		{ label: "森林绿", value: "forest-green-mode" },
-		{ label: "海洋蓝", value: "ocean-blue-mode" },
-		{ label: "粉蓝", value: "pink-blue-mode" },
-		{ label: "霓虹粉", value: "neon-pink-mode" },
-		{ label: "复古橙", value: "retro-orange-mode" },
+		{ value: "candy-mode", labelKey: "themeCandy" },
+		{ value: "mint-mode", labelKey: "themeMint" },
+		{ value: "purple-mode", labelKey: "themePurple" },
+		{ value: "yellow-mode", labelKey: "themeYellow" },
+		{ value: "hot-red-mode", labelKey: "themeHotRed" },
+		{ value: "forest-green-mode", labelKey: "themeForestGreen" },
+		{ value: "ocean-blue-mode", labelKey: "themeOceanBlue" },
+		{ value: "pink-blue-mode", labelKey: "themePinkBlue" },
+		{ value: "neon-pink-mode", labelKey: "themeNeonPink" },
+		{ value: "retro-orange-mode", labelKey: "themeRetroOrange" },
 	],
 	coilnotebook: [
-		{ label: "海蓝", value: "blue-mode" },
-		{ label: "粉色", value: "pink-mode" },
-		{ label: "薄荷绿", value: "mint-mode" },
-		{ label: "暖黄", value: "yellow-mode" },
+		{ value: "blue-mode", labelKey: "themeBlue" },
+		{ value: "pink-mode", labelKey: "themePink" },
+		{ value: "mint-mode", labelKey: "themeMint" },
+		{ value: "yellow-mode", labelKey: "themeWarmYellow" },
 	],
 };
 
@@ -122,7 +131,7 @@ export const DEFAULT_THEMES: Record<string, string> = {
 
 export function getTemplateThemes(
 	templateId: string,
-): Array<{ label: string; value: string }> {
+): Array<{ value: string; labelKey: string }> {
 	return TEMPLATE_THEMES[templateId] ?? [];
 }
 
@@ -159,11 +168,12 @@ export function resolveThemeClassForTemplate(
 	return getDefaultThemeClass(templateId);
 }
 
-export const CARD_WIDTH_OPTIONS: Array<{ value: number; label: string }> = [
-	{ value: 360, label: "360px（窄）" },
-	{ value: 440, label: "440px（默认）" },
-	{ value: 520, label: "520px（宽）" },
-	{ value: 640, label: "640px（更宽）" },
-	{ value: 720, label: "720px（超宽）" },
-	{ value: 800, label: "800px（阅读宽）" },
+/** value 传给 API；labelKey 仅用于 UI 多语言 */
+export const CARD_WIDTH_OPTIONS: Array<{ value: number; labelKey: string }> = [
+	{ value: 360, labelKey: "widthNarrow" },
+	{ value: 440, labelKey: "widthDefault" },
+	{ value: 520, labelKey: "widthWide" },
+	{ value: 640, labelKey: "widthWider" },
+	{ value: 720, labelKey: "widthUltra" },
+	{ value: 800, labelKey: "widthReading" },
 ];

@@ -9,7 +9,8 @@ export default class HtmltoLinkPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-		initI18n(this.app);
+		// 按设置初始化语言（auto 跟随 Obsidian，也可手动 en/zh）
+		initI18n(this.app, this.settings.language ?? "auto");
 
 		// 左侧功能区图标
 		this.addRibbonIcon("share", t("commandPublish"), () => {
@@ -47,6 +48,11 @@ export default class HtmltoLinkPlugin extends Plugin {
 		console.log(`[htmlto-link] loaded v${this.manifest.version}`);
 	}
 
+	/** 切换语言后重新应用 i18n（设置页会立即刷新；命令名需重载插件） */
+	applyLanguage(): void {
+		initI18n(this.app, this.settings.language ?? "auto");
+	}
+
 	onunload() {
 		console.log("[htmlto-link] unloaded");
 	}
@@ -57,6 +63,14 @@ export default class HtmltoLinkPlugin extends Plugin {
 		// 确保 noteShares 始终是对象（旧版本可能没有该字段）
 		if (!this.settings.noteShares || typeof this.settings.noteShares !== "object") {
 			this.settings.noteShares = {};
+		}
+		// 旧版本无 language 字段时回退 auto
+		if (
+			this.settings.language !== "auto" &&
+			this.settings.language !== "en" &&
+			this.settings.language !== "zh"
+		) {
+			this.settings.language = "auto";
 		}
 	}
 

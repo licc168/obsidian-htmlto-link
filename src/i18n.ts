@@ -1,8 +1,10 @@
 import { App } from "obsidian";
+import type { PluginLanguage } from "./constants";
 
 /**
- * 多语言文案。英文（en）为默认/回退语言；
- * 仅当 Obsidian 界面语言为 zh / zh-CN / zh-TW 等中文时切换为中文。
+ * 多语言文案。
+ * - language = auto：跟随 Obsidian 界面语言（中文 → zh，其它 → en）
+ * - language = en / zh：手动指定
  */
 const dict = {
   en: {
@@ -44,6 +46,12 @@ const dict = {
     tipCommand: "Run 'Share current note' from the command palette to publish.",
     commandPublish: "Share current note",
     commandSettings: "Open settings",
+    languageName: "Language",
+    languageDesc:
+      "Plugin UI language. Auto follows Obsidian's language. Restart or re-open dialogs after switching.",
+    languageAuto: "Auto (follow Obsidian)",
+    languageEn: "English",
+    languageZh: "中文",
 
     // publish modal
     publishTitle: "Share Page",
@@ -90,6 +98,65 @@ const dict = {
     invalidJson: "Server returned non-JSON (HTTP ",
     noUrl: "Shared but no link returned",
     httpFailed: "Share failed (HTTP ",
+
+    // template names (UI only; API uses id)
+    tplMemo: "Memo",
+    tplPopart: "Pop Art",
+    tplTraditionalChinese: "Traditional Chinese",
+    tplCoilNotebook: "Coil Notebook",
+    tplPurpleTicket: "Purple Ticket",
+    tplBytedance: "ByteDance",
+    tplWarm: "Warm Soft",
+    tplAlibaba: "Alibaba Orange",
+    tplNotebook: "Notebook",
+    tplDarktech: "Dark Tech",
+    tplFairytale: "Fairy Tale",
+    tplBoardgame: "Board Game",
+    tplCyberpunk: "Cyberpunk",
+    tplGlassmorphism: "Glassmorphism",
+    tplNeonglow: "Neon Glow",
+    tplVintageNewspaper: "Vintage Newspaper",
+    tplHandwritten: "Handwritten Note",
+    tplVintageMap: "Vintage Map",
+    tplBlueprint: "Blueprint",
+    tplBotanical: "Botanical",
+    tplSketch: "Sketch",
+    tplTerminal: "Terminal",
+    tplRetro: "Retro Win95",
+    tplAyulight: "Ayu Light",
+    tplBauhaus: "Bauhaus",
+    tplGreensimple: "Fresh Green",
+    tplMaximalism: "Maximalism",
+    tplNeobrutalism: "Neo Brutalism",
+    tplNewsprint: "Newsprint",
+    tplOrganic: "Wabi-sabi Ceramic",
+    tplPlayfulGeometric: "Playful Geometric",
+    tplProfessional: "Professional",
+
+    // theme labels (UI only; API uses value)
+    themeBright: "Bright",
+    themeDark: "Dark",
+    themeCandy: "Candy",
+    themeMint: "Mint",
+    themePurple: "Purple",
+    themeYellow: "Yellow",
+    themeHotRed: "Hot Red",
+    themeForestGreen: "Forest Green",
+    themeOceanBlue: "Ocean Blue",
+    themePinkBlue: "Pink Blue",
+    themeNeonPink: "Neon Pink",
+    themeRetroOrange: "Retro Orange",
+    themeBlue: "Ocean Blue",
+    themePink: "Pink",
+    themeWarmYellow: "Warm Yellow",
+
+    // card width labels (UI only; API uses number)
+    widthNarrow: "360px (Narrow)",
+    widthDefault: "440px (Default)",
+    widthWide: "520px (Wide)",
+    widthWider: "640px (Wider)",
+    widthUltra: "720px (Ultra)",
+    widthReading: "800px (Reading)",
   },
   zh: {
     settingsTitle: "Share Page",
@@ -123,6 +190,12 @@ const dict = {
     tipCommand: "命令面板搜索「分享当前笔记」即可分享当前笔记。",
     commandPublish: "分享当前笔记",
     commandSettings: "打开设置",
+    languageName: "界面语言",
+    languageDesc:
+      "插件界面语言。自动跟随 Obsidian 语言。切换后重新打开弹窗/设置页即可生效。",
+    languageAuto: "自动（跟随 Obsidian）",
+    languageEn: "English",
+    languageZh: "中文",
 
     publishTitle: "Share Page",
     notePrefix: "笔记：",
@@ -165,16 +238,126 @@ const dict = {
     invalidJson: "服务器返回非 JSON（HTTP ",
     noUrl: "分享成功但未返回链接",
     httpFailed: "分享失败（HTTP ",
+
+    // template names
+    tplMemo: "备忘录",
+    tplPopart: "波普艺术",
+    tplTraditionalChinese: "中国传统",
+    tplCoilNotebook: "线圈笔记本",
+    tplPurpleTicket: "紫色小红书",
+    tplBytedance: "字节范",
+    tplWarm: "温暖柔和",
+    tplAlibaba: "阿里橙",
+    tplNotebook: "笔记本",
+    tplDarktech: "黑色科技",
+    tplFairytale: "儿童童话",
+    tplBoardgame: "桌游风格",
+    tplCyberpunk: "赛博朋克",
+    tplGlassmorphism: "玻璃拟态",
+    tplNeonglow: "霓虹发光",
+    tplVintageNewspaper: "复古报纸",
+    tplHandwritten: "手写笔记",
+    tplVintageMap: "古旧地图",
+    tplBlueprint: "蓝图技术",
+    tplBotanical: "植物图鉴",
+    tplSketch: "手绘涂鸦",
+    tplTerminal: "终端命令行",
+    tplRetro: "复古Win95",
+    tplAyulight: "Ayu暖光",
+    tplBauhaus: "包豪斯",
+    tplGreensimple: "清新绿",
+    tplMaximalism: "极繁主义",
+    tplNeobrutalism: "新粗野主义",
+    tplNewsprint: "报纸印刷",
+    tplOrganic: "侘寂陶艺",
+    tplPlayfulGeometric: "活泼几何",
+    tplProfessional: "专业商务",
+
+    // theme labels
+    themeBright: "高亮",
+    themeDark: "暗黑",
+    themeCandy: "糖果色",
+    themeMint: "薄荷绿",
+    themePurple: "紫色",
+    themeYellow: "黄色",
+    themeHotRed: "热辣红",
+    themeForestGreen: "森林绿",
+    themeOceanBlue: "海洋蓝",
+    themePinkBlue: "粉蓝",
+    themeNeonPink: "霓虹粉",
+    themeRetroOrange: "复古橙",
+    themeBlue: "海蓝",
+    themePink: "粉色",
+    themeWarmYellow: "暖黄",
+
+    // card width labels
+    widthNarrow: "360px（窄）",
+    widthDefault: "440px（默认）",
+    widthWide: "520px（宽）",
+    widthWider: "640px（更宽）",
+    widthUltra: "720px（超宽）",
+    widthReading: "800px（阅读宽）",
   },
 };
 
 let currentLang: "en" | "zh" = "en";
 
-export function initI18n(app: App): void {
-  // getLanguage 为较新 API，类型定义可能尚未包含
-  const lang = (app as App & { getLanguage?: () => string }).getLanguage?.() || "en";
-  // 默认英文；仅当语言以 zh 开头时切换为中文（含 zh-CN / zh-TW）
-  currentLang = lang.toLowerCase().startsWith("zh") ? "zh" : "en";
+/** 从多个来源探测 Obsidian 界面是否为中文 */
+function detectObsidianIsZh(app: App): boolean {
+  // 1) 官方 API（Obsidian 1.5+）
+  const apiLang = (
+    app as App & { getLanguage?: () => string }
+  ).getLanguage?.();
+  if (apiLang && apiLang.toLowerCase().startsWith("zh")) return true;
+  if (apiLang && !apiLang.toLowerCase().startsWith("zh")) return false;
+
+  // 2) Obsidian 本地存储的语言偏好
+  try {
+    const stored =
+      window.localStorage?.getItem("language") ||
+      window.localStorage?.getItem("locale");
+    if (stored && stored.toLowerCase().startsWith("zh")) return true;
+    if (stored && stored.length > 0 && !stored.toLowerCase().startsWith("zh")) {
+      return false;
+    }
+  } catch {
+    // ignore
+  }
+
+  // 3) moment locale（Obsidian 内置）
+  try {
+    const momentLocale = (window as any).moment?.locale?.();
+    if (typeof momentLocale === "string" && momentLocale.toLowerCase().startsWith("zh")) {
+      return true;
+    }
+  } catch {
+    // ignore
+  }
+
+  // 4) 浏览器语言兜底
+  const nav = (navigator.language || "").toLowerCase();
+  return nav.startsWith("zh");
+}
+
+/**
+ * 初始化 / 切换语言。
+ * @param preference auto | en | zh
+ */
+export function initI18n(app: App, preference: PluginLanguage = "auto"): void {
+  if (preference === "en") {
+    currentLang = "en";
+    return;
+  }
+  if (preference === "zh") {
+    currentLang = "zh";
+    return;
+  }
+  // auto
+  currentLang = detectObsidianIsZh(app) ? "zh" : "en";
+}
+
+export function getCurrentLang(): "en" | "zh" {
+  return currentLang;
 }
 
 export function t(

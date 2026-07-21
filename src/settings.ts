@@ -8,6 +8,7 @@ import {
 	hasMultiThemes,
 	resolveThemeClassForTemplate,
 	type HtmltoLinkSettings,
+	type PluginLanguage,
 } from "./constants";
 import { t } from "./i18n";
 
@@ -37,6 +38,25 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			text: t("settingsDesc"),
 			cls: "setting-item-description",
 		});
+
+		// 界面语言（可手动中英文切换）
+		new Setting(containerEl)
+			.setName(t("languageName"))
+			.setDesc(t("languageDesc"))
+			.addDropdown((dropdown) => {
+				dropdown
+					.addOption("auto", t("languageAuto"))
+					.addOption("en", t("languageEn"))
+					.addOption("zh", t("languageZh"))
+					.setValue(this.plugin.settings.language || "auto")
+					.onChange(async (value) => {
+						this.plugin.settings.language = value as PluginLanguage;
+						await this.plugin.saveSettings();
+						this.plugin.applyLanguage();
+						// 立即用新语言重绘设置页
+						this.display();
+					});
+			});
 
 		new Setting(containerEl)
 			.setName(t("apiUrlName"))
@@ -73,7 +93,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			.setDesc(t("defaultTemplateDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of TEMPLATE_OPTIONS) {
-					dropdown.addOption(item.id, item.name);
+					// id 传给 API；显示名走 i18n
+					dropdown.addOption(item.id, t(item.nameKey as any));
 				}
 				dropdown
 					.setValue(this.plugin.settings.templateId)
@@ -99,7 +120,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 				.setDesc(t("defaultThemeDesc"))
 				.addDropdown((dropdown) => {
 					for (const item of themes) {
-						dropdown.addOption(item.value, item.label);
+						// value 传给 API；显示名走 i18n
+						dropdown.addOption(item.value, t(item.labelKey as any));
 					}
 					dropdown
 						.setValue(this.plugin.settings.themeClass)
@@ -116,7 +138,10 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			.setDesc(t("cardWidthDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of CARD_WIDTH_OPTIONS) {
-					dropdown.addOption(String(item.value), item.label);
+					dropdown.addOption(
+						String(item.value),
+						t(item.labelKey as any),
+					);
 				}
 				dropdown
 					.setValue(String(this.plugin.settings.cardWidth))

@@ -98,7 +98,8 @@ export class PublishFlowModal extends Modal {
 			.setDesc(t("templateDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of TEMPLATE_OPTIONS) {
-					dropdown.addOption(item.id, item.name);
+					// id 传给 API；显示名走 i18n
+					dropdown.addOption(item.id, t(item.nameKey as any));
 				}
 				dropdown.setValue(this.draft.templateId).onChange((value) => {
 					this.draft.templateId = value;
@@ -121,7 +122,8 @@ export class PublishFlowModal extends Modal {
 				.setDesc(t("themeDesc"))
 				.addDropdown((dropdown) => {
 					for (const item of themes) {
-						dropdown.addOption(item.value, item.label);
+						// value 传给 API；显示名走 i18n
+						dropdown.addOption(item.value, t(item.labelKey as any));
 					}
 					const current = resolveThemeClassForTemplate(
 						this.draft.templateId,
@@ -143,7 +145,10 @@ export class PublishFlowModal extends Modal {
 			.setDesc(t("modalCardWidthDesc"))
 			.addDropdown((dropdown) => {
 				for (const item of CARD_WIDTH_OPTIONS) {
-					dropdown.addOption(String(item.value), item.label);
+					dropdown.addOption(
+						String(item.value),
+						t(item.labelKey as any),
+					);
 				}
 				const known = CARD_WIDTH_OPTIONS.some(
 					(x) => x.value === this.draft.cardWidth,
