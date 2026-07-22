@@ -1,8 +1,8 @@
 {
 	"id": "htmlto-link",
 	"name": "Share Page",
-	"version": "0.1.2",
-	"minAppVersion": "1.5.0",
+	"version": "0.1.3",
+	"minAppVersion": "1.8.7",
 	"description": "Instantly share a note as a beautiful webpage and copy the public link.",
 	"author": "htmlto.link",
 	"authorUrl": "https://htmlto.link",

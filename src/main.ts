@@ -50,9 +50,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 			id: "open-settings",
 			name: t("commandSettings"),
 			callback: () => {
-				// @ts-ignore - Obsidian 内部 API，打开设置到本插件
 				this.app.setting.open();
-				// @ts-ignore
 				this.app.setting.openTabById(this.manifest.id);
 			},
 		});
