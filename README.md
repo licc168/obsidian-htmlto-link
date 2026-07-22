@@ -1,131 +1,99 @@
-# Share Page（Obsidian 插件）
+# Share Page — Obsidian Plugin
 
-一键将当前 Obsidian 笔记分享为 [htmlto.link](https://htmlto.link) 精美网页，并复制公开链接。
+[中文文档](README_zh.md)
 
-## 功能
+Instantly share any Obsidian note as a beautiful webpage via [htmlto.link](https://htmlto.link) and copy the public link.
 
-- 命令面板：`Share current note`
-- 左侧功能区「分享」图标一键分享
-- 可选模板（备忘录 / 波普艺术 / 中国传统 / 线圈笔记本…）
-- 分享成功后：复制链接 / 打开浏览器 / 追加到笔记末尾
-- 可配置 API 地址（默认 `https://htmlto.link`，支持自建）
+## Features
 
-## 安装（开发版）
+- **One-click share** — Ribbon icon or command palette (`Share current note`)
+- **30+ templates** — Memo, Pop Art, Traditional Chinese, Coil Notebook, Cyberpunk, Glassmorphism, and more
+- **Theme variants** — Multiple color themes per template (e.g. Bright / Dark for Memo)
+- **Card width options** — 360 / 440 / 520 / 640 / 720 / 800 px
+- **Delete share** — Remove a previously shared link (`Delete share for current note`)
+- **Frontmatter integration** — Automatically writes `share_link` and `share_updated` to note properties after sharing
+- **i18n** — UI follows Obsidian language (English / 中文), or set manually
+- **Self-hostable** — Configurable API base URL
 
-### 1. 构建
+## Installation
+
+### From Obsidian Community Plugins (coming soon)
+
+Search **"Share Page"** in Settings → Community plugins → Browse.
+
+### Manual / BRAT
+
+1. Download `main.js`, `manifest.json`, `styles.css` from the latest [GitHub Release](https://github.com/licc168/obsidian-htmlto-link/releases).
+2. Place them in `<your-vault>/.obsidian/plugins/htmlto-link/`.
+3. Enable **Share Page** in Settings → Community plugins.
+
+### Build from source
 
 ```bash
-cd htmlto-link-obsidian
+git clone https://github.com/licc168/obsidian-htmlto-link.git
+cd obsidian-htmlto-link
 npm install
 npm run build
 ```
 
-会生成 `main.js`。
+Copy `main.js`, `manifest.json`, `styles.css` to your vault's plugin directory.
 
-### 2. 装到 Obsidian
+## Usage
 
-1. 打开 Obsidian → 设置 → 社区插件 → 关闭「受限模式」
-2. 在 vault 下创建插件目录：
+1. Open any Markdown note.
+2. `Ctrl/Cmd + P` → search **Share current note** (or click the share icon in the ribbon).
+3. Pick a template / width (optional), then confirm.
+4. The share link is copied to your clipboard automatically.
 
-```
-<你的Vault>/.obsidian/plugins/htmlto-link/
-```
+To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
 
-3. 复制以下文件到该目录：
+## Settings
 
-- `main.js`
-- `manifest.json`
-- `styles.css`
+| Setting | Description |
+|---------|-------------|
+| API Base URL | Default `https://htmlto.link`, supports self-hosting |
+| API Token | Optional; guest shares expire in 24 h |
+| Default Template | memo / popart / traditionalchinese / coilnotebook / … |
+| Theme Class | e.g. `bright-mode`, `candy-mode` |
+| Card Width | 360 – 800 px |
+| Language | Auto / English / 中文 |
+| Copy link on success | Enabled by default |
+| Open in browser | Disabled by default |
+| Write share info to note | Writes `share_link` / `share_updated` to frontmatter |
+| Show options on publish | Template & width picker dialog |
 
-4. 设置 → 社区插件 → 启用 **Share Page**
+## Privacy & Data
 
-### 3. 使用
+- The plugin sends the **note content** (Markdown) to the configured API server to generate a share page.
+- No data is collected beyond what is needed for the share request.
+- Guest shares expire after 24 hours.
 
-1. 打开任意 Markdown 笔记
-2. `Ctrl/Cmd + P` → 搜索 `Share current note`
-3. 等待提示「分享成功」并复制链接
-4. 浏览器打开链接即可查看
-
-## 设置项
-
-| 设置 | 说明 |
-|------|------|
-| API 地址 | 默认 `https://htmlto.link` |
-| 默认模板 | memo / popart / traditionalchinese / coilnotebook… |
-| 主题 class | 如 `bright-mode`、`candy-mode` |
-| 卡片宽度 | 360 / 440 / 520 / 640 |
-| 复制链接 | 默认开启 |
-| 打开浏览器 | 默认关闭 |
-| 追加到笔记 | 默认关闭 |
-
-## 开发
+## Development
 
 ```bash
 npm install
-npm run dev    # watch 模式，改代码自动重新打包 main.js
-npm run build  # 生产构建
+npm run dev    # watch mode
+npm run build  # production build
 ```
 
-开发时可用符号链接把本仓库指到 vault 插件目录，改完自动生效：
-
-```powershell
-# Windows 示例（管理员或开发者模式）
-New-Item -ItemType Junction `
-  -Path "D:\path\to\vault\.obsidian\plugins\htmlto-link" `
-  -Target "D:\licc\htmltolink\htmlto-link-obsidian"
-```
-
-然后在该目录执行 `npm run dev`，Obsidian 里 `Ctrl+R` 重载插件。
-
-## 当前限制（MVP）
-
-1. **游客分享**：走 `/api/shares`，链接有有效期（与网站一致）
-2. **本地图片**：`![[image.png]]` / 相对路径图片暂不自动上传，建议用外链
-3. **Wiki 链接**：`[[笔记]]` 会转成纯文本显示名，不做跨页跳转
-4. **登录账号 / 长期链接**：后续版本可接 token
-
-## API
-
-```http
-POST {apiBaseUrl}/api/shares
-Content-Type: application/json
-
-{
-  "markdown": "# Hello",
-  "templateId": "memo",
-  "themeClass": "bright-mode",
-  "cardWidth": 440
-}
-```
-
-成功响应示例：
-
-```json
-{
-  "ok": true,
-  "id": "xxxx",
-  "url": "https://htmlto.link/s/xxxx",
-  "expiresAt": "..."
-}
-```
-
-## 目录结构
+## Project Structure
 
 ```
-htmlto-link-obsidian/
+obsidian-htmlto-link/
 ├── manifest.json
 ├── package.json
 ├── styles.css
 ├── esbuild.config.mjs
 ├── src/
-│   ├── main.ts        # 插件入口
-│   ├── settings.ts    # 设置页
-│   ├── constants.ts   # 默认配置 / 模板列表
-│   ├── api.ts         # 调用 /api/shares
-│   └── publish.ts     # 读笔记 + 发布流程
+│   ├── main.ts        # Plugin entry
+│   ├── settings.ts    # Settings tab
+│   ├── constants.ts   # Defaults / templates
+│   ├── api.ts         # API client
+│   ├── publish.ts     # Share & delete logic
+│   └── i18n.ts        # Internationalization
 └── README.md
 ```
 
 ## License
 
-MIT
+[MIT](LICENSE)
