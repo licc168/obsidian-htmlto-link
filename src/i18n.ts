@@ -32,8 +32,9 @@ const dict = {
       "Automatically copy the link when the success dialog opens (you can still click 'Copy link' inside it).",
     openBrowserName: "Open in browser after publish",
     openBrowserDesc: "Open the share page in your system browser after success.",
-    appendLinkName: "Append link to note",
-    appendLinkDesc: "Append the share link at the bottom of the current note.",
+    writeFrontmatterName: "Write share info to frontmatter",
+    writeFrontmatterDesc:
+      "After sharing, write share_link and share_updated into the note's frontmatter (Properties).",
     tipsTitle: "Notes",
     tipTokenFilled:
       "API Token set: the share link belongs to your account and lasts longer per your plan.",
@@ -45,6 +46,7 @@ const dict = {
       "Local images are not uploaded automatically. Use external image links or upload to an image host first.",
     tipCommand: "Run 'Share current note' from the command palette to publish.",
     commandPublish: "Share current note",
+    commandDeleteShare: "Delete this shared note",
     commandSettings: "Open settings",
     languageName: "Language",
     languageDesc:
@@ -91,7 +93,15 @@ const dict = {
       "Guest share: link kept for only 24 hours. Add an API Token for a longer lifetime.",
     guestWarning:
       "No API Token set — this is a guest share: the share link is kept for only 24 hours. Add a Token in plugin settings for a longer lifetime.",
-    appendStamp: "Share link ({time}): ",
+    // delete share
+    deleteConfirmTitle: "Delete share",
+    deleteConfirmMsg: "Are you sure you want to delete the share for \"{note}\"? The public link will no longer be accessible.",
+    deleteConfirmYes: "Delete",
+    deleteConfirmNo: "Cancel",
+    deletingNotice: "Deleting share…",
+    deleteSuccess: "Share deleted successfully.",
+    deleteFailed: "Delete failed: ",
+    noShareToDelete: "This note has not been shared yet.",
 
     // api errors
     networkFailed: "Network request failed: ",
@@ -181,8 +191,9 @@ const dict = {
       "成功弹窗打开时，是否同时自动复制链接（弹窗里仍可再点「复制链接」）。",
     openBrowserName: "发布后打开浏览器",
     openBrowserDesc: "成功后在系统浏览器中打开分享页。",
-    appendLinkName: "在笔记末尾追加链接",
-    appendLinkDesc: "发布成功后，在当前笔记底部追加分享链接。",
+    writeFrontmatterName: "将分享信息写入笔记属性",
+    writeFrontmatterDesc:
+      "分享成功后，将 share_link 和 share_updated 写入笔记的 frontmatter（属性）中。",
     tipsTitle: "说明",
     tipTokenFilled: "已填写 API Token：分享链接归属于你的账号，按套餐享受更长有效期。",
     tipTokenGuest: "未填写 Token 时走游客模式：分享链接仅保留 24 小时。",
@@ -190,6 +201,7 @@ const dict = {
     tipImages: "本地图片暂不自动上传，建议使用外链图或先上传到图床。",
     tipCommand: "命令面板搜索「分享当前笔记」即可分享当前笔记。",
     commandPublish: "分享当前笔记",
+    commandDeleteShare: "删除当前笔记的分享",
     commandSettings: "打开设置",
     languageName: "界面语言",
     languageDesc:
@@ -233,7 +245,15 @@ const dict = {
     guestNoteGuestSimple: "游客分享：链接仅保留 24 小时。填写 API Token 可延长有效期。",
     guestWarning:
       "未填写 API Token，本次为游客分享：分享链接仅保留 24 小时。可在插件设置中填写 Token 延长有效期。",
-    appendStamp: "分享链接（{time}）：",
+    // delete share
+    deleteConfirmTitle: "删除分享",
+    deleteConfirmMsg: "确定要删除「{note}」的分享吗？删除后公开链接将无法访问。",
+    deleteConfirmYes: "删除",
+    deleteConfirmNo: "取消",
+    deletingNotice: "正在删除分享…",
+    deleteSuccess: "分享已删除。",
+    deleteFailed: "删除失败：",
+    noShareToDelete: "当前笔记尚未分享。",
 
     networkFailed: "网络请求失败：",
     invalidJson: "服务器返回非 JSON（HTTP ",

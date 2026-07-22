@@ -1,7 +1,7 @@
 import { MarkdownView, Plugin } from "obsidian";
 import { DEFAULT_SETTINGS, type HtmltoLinkSettings } from "./constants";
 import { HtmltoLinkSettingTab } from "./settings";
-import { publishActiveNote } from "./publish";
+import { publishActiveNote, deleteShareActiveNote } from "./publish";
 import { initI18n, t } from "./i18n";
 
 export default class HtmltoLinkPlugin extends Plugin {
@@ -26,6 +26,20 @@ export default class HtmltoLinkPlugin extends Plugin {
 				if (!view) return false;
 				if (!checking) {
 					void publishActiveNote(this);
+				}
+				return true;
+			},
+		});
+
+		// 命令：删除当前笔记的分享
+		this.addCommand({
+			id: "delete-current-note-share",
+			name: t("commandDeleteShare"),
+			checkCallback: (checking: boolean) => {
+				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (!view) return false;
+				if (!checking) {
+					void deleteShareActiveNote(this);
 				}
 				return true;
 			},

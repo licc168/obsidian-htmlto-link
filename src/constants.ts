@@ -26,8 +26,8 @@ export interface HtmltoLinkSettings {
 	copyLinkOnSuccess: boolean;
 	/** 成功后打开浏览器 */
 	openInBrowser: boolean;
-	/** 成功后在笔记末尾追加链接 */
-	appendLinkToNote: boolean;
+	/** 成功后将分享链接和更新时间写入笔记 frontmatter */
+	writeShareToNote: boolean;
 	/** 发布时是否弹出模板/宽度选择框 */
 	showOptionsOnPublish: boolean;
 	/**
@@ -46,7 +46,7 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	language: "auto",
 	copyLinkOnSuccess: true,
 	openInBrowser: false,
-	appendLinkToNote: false,
+	writeShareToNote: true,
 	showOptionsOnPublish: true,
 	noteShares: {},
 };

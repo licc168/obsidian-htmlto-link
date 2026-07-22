@@ -1,6 +1,6 @@
-import { MarkdownView, Notice, TFile } from "obsidian";
+import { MarkdownView, Modal, Notice, TFile } from "obsidian";
 import type HtmltoLinkPlugin from "./main";
-import { createSharePage } from "./api";
+import { createSharePage, deleteSharePage } from "./api";
 import {
 	type NoteShareRecord,
 	resolveThemeClassForTemplate,
@@ -132,8 +132,8 @@ async function doPublish(
 		}
 	}
 
-	if (plugin.settings.appendLinkToNote) {
-		await appendShareLink(plugin, file, url);
+	if (plugin.settings.writeShareToNote) {
+		await writeShareToFrontmatter(plugin, file, url);
 	}
 
 	if (plugin.settings.openInBrowser) {
@@ -209,15 +209,123 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 	}
 }
 
-async function appendShareLink(
+/**
+ * 将分享链接和更新时间写入笔记 frontmatter（属性面板）。
+ * 写入字段：share_link / share_updated
+ */
+async function writeShareToFrontmatter(
 	plugin: HtmltoLinkPlugin,
 	file: TFile,
 	url: string,
 ): Promise<void> {
-	const stamp = new Date().toISOString().slice(0, 19).replace("T", " ");
-	const block = `\n\n---\n\n> ${t("appendStamp", { time: stamp })}[${url}](${url})\n`;
-	await plugin.app.vault.process(file, (data) => {
-		if (data.includes(url)) return data;
-		return data + block;
+	// 生成带时区偏移的 ISO 8601 时间戳，如 2026-07-22T10:01:11+08:00
+	const now = new Date();
+	const offset = -now.getTimezoneOffset();
+	const sign = offset >= 0 ? "+" : "-";
+	const pad = (n: number) => String(Math.abs(n)).padStart(2, "0");
+	const tz = `${sign}${pad(Math.floor(offset / 60))}:${pad(offset % 60)}`;
+	const iso = now.toISOString().replace("Z", tz);
+
+	await plugin.app.fileManager.processFrontMatter(file, (fm) => {
+		fm["share_link"] = url;
+		fm["share_updated"] = iso;
 	});
+}
+
+/**
+ * 从笔记 frontmatter 中移除分享相关字段。
+ */
+async function removeShareFromFrontmatter(
+	plugin: HtmltoLinkPlugin,
+	file: TFile,
+): Promise<void> {
+	await plugin.app.fileManager.processFrontMatter(file, (fm) => {
+		delete fm["share_link"];
+		delete fm["share_updated"];
+	});
+}
+
+/**
+ * 删除当前笔记的分享。
+ * 1. 确认弹窗
+ * 2. 调用 API 删除服务端分享
+ * 3. 清除本地 noteShares 记录
+ * 4. 清除 frontmatter 中的 share_link / share_updated
+ */
+export async function deleteShareActiveNote(
+	plugin: HtmltoLinkPlugin,
+): Promise<void> {
+	const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
+	if (!view) {
+		new Notice(t("errNoView"));
+		return;
+	}
+
+	const file = view.file;
+	if (!file) {
+		new Notice(t("errNoFile"));
+		return;
+	}
+
+	const record = getNoteShare(plugin, file);
+	if (!record) {
+		new Notice(t("noShareToDelete"));
+		return;
+	}
+
+	// 确认弹窗
+	const noteName = file.basename;
+	const confirmed = await new Promise<boolean>((resolve) => {
+		let resolved = false;
+		class ConfirmModal extends Modal {
+			onOpen() {
+				this.titleEl.setText(t("deleteConfirmTitle"));
+				this.contentEl.createEl("p", {
+					text: t("deleteConfirmMsg", { note: noteName }),
+				});
+				const btnRow = this.contentEl.createDiv({ cls: "modal-button-container" });
+				const cancelBtn = btnRow.createEl("button", { text: t("deleteConfirmNo") });
+				cancelBtn.addEventListener("click", () => {
+					resolved = true;
+					resolve(false);
+					this.close();
+				});
+				const deleteBtn = btnRow.createEl("button", {
+					text: t("deleteConfirmYes"),
+					cls: "mod-warning",
+				});
+				deleteBtn.addEventListener("click", () => {
+					resolved = true;
+					resolve(true);
+					this.close();
+				});
+			}
+			onClose() {
+				if (!resolved) resolve(false);
+			}
+		}
+		new ConfirmModal(plugin.app).open();
+	});
+
+	if (!confirmed) return;
+
+	const notice = new Notice(t("deletingNotice"), 0);
+	try {
+		await deleteSharePage(plugin.settings, record.slug, record.updateToken);
+
+		// 清除本地记录
+		delete plugin.settings.noteShares[file.path];
+		await plugin.saveSettings();
+
+		// 清除 frontmatter
+		await removeShareFromFrontmatter(plugin, file);
+
+		notice.hide();
+		new Notice(t("deleteSuccess"), 5000);
+	} catch (err) {
+		notice.hide();
+		const message = err instanceof Error ? err.message : String(err);
+		new Notice(t("deleteFailed") + message, 10000);
+		console.error("[htmlto-link] delete share failed", err);
+	}
 }

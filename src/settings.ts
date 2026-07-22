@@ -188,13 +188,13 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName(t("appendLinkName"))
-			.setDesc(t("appendLinkDesc"))
+			.setName(t("writeFrontmatterName"))
+			.setDesc(t("writeFrontmatterDesc"))
 			.addToggle((toggle) =>
 				toggle
-					.setValue(this.plugin.settings.appendLinkToNote)
+					.setValue(this.plugin.settings.writeShareToNote)
 					.onChange(async (value) => {
-						this.plugin.settings.appendLinkToNote = value;
+						this.plugin.settings.writeShareToNote = value;
 						await this.plugin.saveSettings();
 					}),
 			);

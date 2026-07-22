@@ -127,6 +127,55 @@ function finalizeResponse(
 }
 
 /**
+ * 删除分享页
+ * DELETE /api/shares/:slug  body: { updateToken }
+ */
+export async function deleteSharePage(
+	settings: HtmltoLinkSettings,
+	slug: string,
+	updateToken: string,
+): Promise<void> {
+	const base = settings.apiBaseUrl.replace(/\/+$/, "");
+	const apiToken = settings.apiToken.trim();
+	const url = `${base}/api/shares/${encodeURIComponent(slug)}`;
+
+	const headers: Record<string, string> = {
+		"Content-Type": "application/json",
+		Accept: "application/json",
+	};
+	if (apiToken) {
+		headers["Authorization"] = `Bearer ${apiToken}`;
+	}
+
+	let res;
+	try {
+		res = await requestUrl({
+			url,
+			method: "DELETE",
+			headers,
+			body: JSON.stringify({ updateToken }),
+			throw: false,
+		});
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		throw new ApiError(t("networkFailed") + message, true);
+	}
+
+	if (res.status >= 400) {
+		let errMsg = t("httpFailed") + res.status + ")";
+		try {
+			const data = typeof res.json === "object" && res.json !== null
+				? res.json
+				: JSON.parse(res.text || "{}");
+			if (data?.error) errMsg = data.error;
+		} catch {
+			// ignore parse error
+		}
+		throw new ApiError(errMsg, false);
+	}
+}
+
+/**
  * 创建或更新分享页
  * - 有 slug + updateToken 时：PUT 更新同一 URL
  * - 更新失败（过期/无权限/接口不存在）：回退为 POST 新建
