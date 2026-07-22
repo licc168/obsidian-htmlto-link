@@ -356,9 +356,7 @@ function detectObsidianIsZh(app: App): boolean {
     // ignore
   }
 
-  // 4) 浏览器语言兜底
-  const nav = (navigator.language || "").toLowerCase();
-  return nav.startsWith("zh");
+  return false;
 }
 
 /**
@@ -383,10 +381,11 @@ export function getCurrentLang(): "en" | "zh" {
 }
 
 export function t(
-  key: keyof typeof dict.en,
+  key: string,
   vars?: Record<string, string | number>,
 ): string {
-  let str: string = (dict as any)[currentLang]?.[key] ?? dict.en[key] ?? key;
+  const langDict = dict[currentLang] as Record<string, string> | undefined;
+  let str: string = langDict?.[key] ?? (dict.en as Record<string, string>)[key] ?? key;
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
       str = str.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));

@@ -17,7 +17,7 @@ Instantly share any Obsidian note as a beautiful webpage via [htmlto.link](https
 
 ## Installation
 
-### From Obsidian Community Plugins (coming soon)
+### From Obsidian Community Plugins
 
 Search **"Share Page"** in Settings → Community plugins → Browse.
 

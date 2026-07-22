@@ -19,7 +19,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 
 		// 命令：分享当前笔记（会弹模板/宽度选择）
 		this.addCommand({
-			id: "publish-current-note",
+			id: "publish-current",
 			name: t("commandPublish"),
 			checkCallback: (checking: boolean) => {
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -33,7 +33,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 
 		// 命令：删除当前笔记的分享
 		this.addCommand({
-			id: "delete-current-note-share",
+			id: "delete-current-share",
 			name: t("commandDeleteShare"),
 			checkCallback: (checking: boolean) => {
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -47,7 +47,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 
 		// 命令：打开设置
 		this.addCommand({
-			id: "open-htmlto-link-settings",
+			id: "open-settings",
 			name: t("commandSettings"),
 			callback: () => {
 				// @ts-ignore - Obsidian 内部 API，打开设置到本插件
@@ -59,7 +59,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 
 		this.addSettingTab(new HtmltoLinkSettingTab(this.app, this));
 
-		console.log(`[htmlto-link] loaded v${this.manifest.version}`);
+		// plugin loaded
 	}
 
 	/** 切换语言后重新应用 i18n（设置页会立即刷新；命令名需重载插件） */
@@ -68,7 +68,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log("[htmlto-link] unloaded");
+		// plugin unloaded
 	}
 
 	async loadSettings() {

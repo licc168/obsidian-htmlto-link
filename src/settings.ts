@@ -33,7 +33,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			this.plugin.settings.themeClass,
 		);
 
-		containerEl.createEl("h2", { text: t("settingsTitle") });
+		new Setting(containerEl).setName(t("settingsTitle")).setHeading();
 		containerEl.createEl("p", {
 			text: t("settingsDesc"),
 			cls: "setting-item-description",
@@ -94,7 +94,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			.addDropdown((dropdown) => {
 				for (const item of TEMPLATE_OPTIONS) {
 					// id 传给 API；显示名走 i18n
-					dropdown.addOption(item.id, t(item.nameKey as any));
+					dropdown.addOption(item.id, t(item.nameKey));
 				}
 				dropdown
 					.setValue(this.plugin.settings.templateId)
@@ -121,7 +121,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 				.addDropdown((dropdown) => {
 					for (const item of themes) {
 						// value 传给 API；显示名走 i18n
-						dropdown.addOption(item.value, t(item.labelKey as any));
+						dropdown.addOption(item.value, t(item.labelKey));
 					}
 					dropdown
 						.setValue(this.plugin.settings.themeClass)
@@ -140,7 +140,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 				for (const item of CARD_WIDTH_OPTIONS) {
 					dropdown.addOption(
 						String(item.value),
-						t(item.labelKey as any),
+						t(item.labelKey),
 					);
 				}
 				dropdown
@@ -199,7 +199,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 					}),
 			);
 
-		containerEl.createEl("h3", { text: t("tipsTitle") });
+		new Setting(containerEl).setName(t("tipsTitle")).setHeading();
 		const tips = containerEl.createEl("ul");
 		const hasToken = this.plugin.settings.apiToken.trim().length > 0;
 		tips.createEl("li", {

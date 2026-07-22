@@ -87,7 +87,7 @@ async function requestJson(
 			body: JSON.stringify(body),
 			throw: false,
 		});
-	} catch (err) {
+	} catch (err: unknown) {
 		const message = err instanceof Error ? err.message : String(err);
 		throw new ApiError(t("networkFailed") + message, true);
 	}
@@ -156,7 +156,7 @@ export async function deleteSharePage(
 			body: JSON.stringify({ updateToken }),
 			throw: false,
 		});
-	} catch (err) {
+	} catch (err: unknown) {
 		const message = err instanceof Error ? err.message : String(err);
 		throw new ApiError(t("networkFailed") + message, true);
 	}
@@ -210,7 +210,7 @@ export async function createSharePage(
 					updated: true,
 				});
 			}
-		} catch (err) {
+		} catch (err: unknown) {
 			// 网络类错误直接抛出；业务失败则新建
 			if (err instanceof ApiError && err.isNetwork) {
 				throw err;

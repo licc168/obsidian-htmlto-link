@@ -205,7 +205,7 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 		notice.hide();
 		const message = err instanceof Error ? err.message : String(err);
 		new Notice(t("publishFailed") + message, 10000);
-		console.error("[htmlto-link] publish failed", err);
+		// publish failed silently
 	}
 }
 

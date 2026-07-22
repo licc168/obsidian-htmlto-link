@@ -99,7 +99,7 @@ export class PublishFlowModal extends Modal {
 			.addDropdown((dropdown) => {
 				for (const item of TEMPLATE_OPTIONS) {
 					// id 传给 API；显示名走 i18n
-					dropdown.addOption(item.id, t(item.nameKey as any));
+					dropdown.addOption(item.id, t(item.nameKey));
 				}
 				dropdown.setValue(this.draft.templateId).onChange((value) => {
 					this.draft.templateId = value;
@@ -123,7 +123,7 @@ export class PublishFlowModal extends Modal {
 				.addDropdown((dropdown) => {
 					for (const item of themes) {
 						// value 传给 API；显示名走 i18n
-						dropdown.addOption(item.value, t(item.labelKey as any));
+						dropdown.addOption(item.value, t(item.labelKey));
 					}
 					const current = resolveThemeClassForTemplate(
 						this.draft.templateId,
@@ -147,7 +147,7 @@ export class PublishFlowModal extends Modal {
 				for (const item of CARD_WIDTH_OPTIONS) {
 					dropdown.addOption(
 						String(item.value),
-						t(item.labelKey as any),
+						t(item.labelKey),
 					);
 				}
 				const known = CARD_WIDTH_OPTIONS.some(
@@ -219,7 +219,7 @@ export class PublishFlowModal extends Modal {
 			this.errorMessage =
 				err instanceof Error ? err.message : String(err);
 			this.render();
-			console.error("[htmlto-link] publish failed", err);
+			// publish failed silently
 		}
 	}
 }
