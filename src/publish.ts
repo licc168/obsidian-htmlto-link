@@ -201,7 +201,7 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 		const info = await doPublish(plugin, file, markdown, initial);
 		notice.hide();
 		openPublishSuccess(plugin.app, info);
-	} catch (err) {
+	} catch (err: unknown) {
 		notice.hide();
 		const message = err instanceof Error ? err.message : String(err);
 		new Notice(t("publishFailed") + message, 10000);
@@ -322,10 +322,9 @@ export async function deleteShareActiveNote(
 
 		notice.hide();
 		new Notice(t("deleteSuccess"), 5000);
-	} catch (err) {
+	} catch (err: unknown) {
 		notice.hide();
 		const message = err instanceof Error ? err.message : String(err);
 		new Notice(t("deleteFailed") + message, 10000);
-		console.error("[htmlto-link] delete share failed", err);
 	}
 }

@@ -1,4 +1,4 @@
-import { App } from "obsidian";
+import { getLanguage, type App } from "obsidian";
 import type { PluginLanguage } from "./constants";
 
 /**
@@ -324,46 +324,16 @@ const dict = {
 
 let currentLang: "en" | "zh" = "en";
 
-/** 从多个来源探测 Obsidian 界面是否为中文 */
-function detectObsidianIsZh(app: App): boolean {
-  // 1) 官方 API（Obsidian 1.5+）
-  const apiLang = (
-    app as App & { getLanguage?: () => string }
-  ).getLanguage?.();
-  if (apiLang && apiLang.toLowerCase().startsWith("zh")) return true;
-  if (apiLang && !apiLang.toLowerCase().startsWith("zh")) return false;
-
-  // 2) Obsidian 本地存储的语言偏好
-  try {
-    const stored =
-      window.localStorage?.getItem("language") ||
-      window.localStorage?.getItem("locale");
-    if (stored && stored.toLowerCase().startsWith("zh")) return true;
-    if (stored && stored.length > 0 && !stored.toLowerCase().startsWith("zh")) {
-      return false;
-    }
-  } catch {
-    // ignore
-  }
-
-  // 3) moment locale（Obsidian 内置）
-  try {
-    const momentLocale = (window as any).moment?.locale?.();
-    if (typeof momentLocale === "string" && momentLocale.toLowerCase().startsWith("zh")) {
-      return true;
-    }
-  } catch {
-    // ignore
-  }
-
-  return false;
+/** 使用 Obsidian 官方 getLanguage() API 探测界面是否为中文 */
+function detectObsidianIsZh(): boolean {
+  return getLanguage().toLowerCase().startsWith("zh");
 }
 
 /**
  * 初始化 / 切换语言。
  * @param preference auto | en | zh
  */
-export function initI18n(app: App, preference: PluginLanguage = "auto"): void {
+export function initI18n(_app: App, preference: PluginLanguage = "auto"): void {
   if (preference === "en") {
     currentLang = "en";
     return;
@@ -373,7 +343,7 @@ export function initI18n(app: App, preference: PluginLanguage = "auto"): void {
     return;
   }
   // auto
-  currentLang = detectObsidianIsZh(app) ? "zh" : "en";
+  currentLang = detectObsidianIsZh() ? "zh" : "en";
 }
 
 export function getCurrentLang(): "en" | "zh" {

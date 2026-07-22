@@ -214,7 +214,7 @@ export class PublishFlowModal extends Modal {
 			this.result = result;
 			this.phase = "success";
 			this.render();
-		} catch (err) {
+		} catch (err: unknown) {
 			this.phase = "error";
 			this.errorMessage =
 				err instanceof Error ? err.message : String(err);
@@ -314,26 +314,18 @@ function renderSuccessContent(
 		}, 2000);
 	};
 
-	copyBtn.addEventListener("click", async () => {
-		try {
-			await navigator.clipboard.writeText(info.url);
-			setCopied();
-			new Notice(t("noticeCopied"));
-		} catch {
-			urlInput.focus();
-			urlInput.select();
-			try {
-				const ok = document.execCommand("copy");
-				if (ok) {
-					setCopied();
-					new Notice(t("noticeCopied"));
-				} else {
-					statusEl.setText(t("copyFailed"));
-				}
-			} catch {
+	copyBtn.addEventListener("click", () => {
+		navigator.clipboard
+			.writeText(info.url)
+			.then(() => {
+				setCopied();
+				new Notice(t("noticeCopied"));
+			})
+			.catch(() => {
+				urlInput.focus();
+				urlInput.select();
 				statusEl.setText(t("copyFailed"));
-			}
-		}
+			});
 	});
 
 	const closeBtn = actions.createEl("button", { text: t("close") });
