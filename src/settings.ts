@@ -57,35 +57,43 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 					});
 			});
 
-		new Setting(containerEl)
-			.setName(t("apiUrlName"))
-			.setDesc(t("apiUrlDesc"))
-			.addText((text) =>
-				text
-					.setPlaceholder("https://htmlto.link")
-					.setValue(this.plugin.settings.apiBaseUrl)
-					.onChange(async (value) => {
-						this.plugin.settings.apiBaseUrl = value
-							.trim()
-							.replace(/\/+$/, "");
-						await this.plugin.saveSettings();
-					}),
-			);
+		// Token 说明：步骤 + 可点击打开网站设置
+		const tokenDesc = document.createDocumentFragment();
+		tokenDesc.appendChild(document.createTextNode(t("apiTokenDesc")));
+		tokenDesc.appendChild(document.createElement("br"));
+		const tokenHelp = document.createElement("a");
+		tokenHelp.textContent = t("apiTokenHelpLink");
+		tokenHelp.href = "https://htmlto.link/settings";
+		tokenHelp.target = "_blank";
+		tokenHelp.rel = "noopener noreferrer";
+		tokenDesc.appendChild(tokenHelp);
 
 		new Setting(containerEl)
 			.setName(t("apiTokenName"))
-			.setDesc(t("apiTokenDesc"))
-			.addText((text) =>
+			.setDesc(tokenDesc)
+			.addText((text) => {
 				text
-					.setPlaceholder(t("apiTokenName"))
+					.setPlaceholder(t("apiTokenPlaceholder"))
 					.setValue(this.plugin.settings.apiToken)
 					.onChange(async (value) => {
 						this.plugin.settings.apiToken = value
 							.trim()
 							.replace(/\s+/g, "");
 						await this.plugin.saveSettings();
-					}),
-			);
+					});
+				// 密码式展示，避免 Token 明文常显
+				text.inputEl.type = "password";
+				text.inputEl.autocomplete = "off";
+				text.inputEl.spellcheck = false;
+			})
+			.addExtraButton((btn) => {
+				btn
+					.setIcon("external-link")
+					.setTooltip(t("apiTokenHelpTooltip"))
+					.onClick(() => {
+						window.open("https://htmlto.link/settings", "_blank");
+					});
+			});
 
 		new Setting(containerEl)
 			.setName(t("defaultTemplateName"))
@@ -186,6 +194,17 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 		tips.createEl("li", {
 			text: hasToken ? t("tipTokenFilled") : t("tipTokenGuest"),
 		});
+		if (!hasToken) {
+			const howTo = tips.createEl("li");
+			howTo.appendChild(document.createTextNode(t("tipTokenHowToPrefix")));
+			const link = document.createElement("a");
+			link.textContent = "https://htmlto.link/settings";
+			link.href = "https://htmlto.link/settings";
+			link.target = "_blank";
+			link.rel = "noopener noreferrer";
+			howTo.appendChild(link);
+			howTo.appendChild(document.createTextNode(t("tipTokenHowToSuffix")));
+		}
 		tips.createEl("li", { text: t("tipThemes") });
 		tips.createEl("li", { text: t("tipImages") });
 		tips.createEl("li", { text: t("tipCommand") });

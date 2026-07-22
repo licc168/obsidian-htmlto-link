@@ -13,7 +13,7 @@
 - **删除分享** — 移除已分享的链接（`删除当前笔记的分享`）
 - **Frontmatter 集成** — 分享成功后自动写入 `share_link` 和 `share_updated` 到笔记属性
 - **多语言** — 界面跟随 Obsidian 语言（English / 中文），也可手动设置
-- **支持自建** — 可配置 API 地址
+- **Token 引导** — 说明如何从 htmlto.link 设置页获取 API Token，并提供一键跳转
 
 ## 安装
 
@@ -51,8 +51,7 @@ npm run build
 
 | 设置 | 说明 |
 |------|------|
-| API 地址 | 默认 `https://htmlto.link`，支持自建 |
-| API Token | 可选；游客分享链接 24 小时后过期 |
+| API Token | 可选。留空=游客（24h）；登录 [htmlto.link/settings](https://htmlto.link/settings) 复制 API Token 后粘贴，链接归账号且有效期更长 |
 | 默认模板 | memo / popart / traditionalchinese / coilnotebook / … |
 | 主题 class | 如 `bright-mode`、`candy-mode` |
 | 界面语言 | 自动 / English / 中文 |

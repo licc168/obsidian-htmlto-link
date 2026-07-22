@@ -13,7 +13,7 @@ Instantly share any Obsidian note as a beautiful webpage via [htmlto.link](https
 - **Delete share** — Remove a previously shared link (`Delete share for current note`)
 - **Frontmatter integration** — Automatically writes `share_link` and `share_updated` to note properties after sharing
 - **i18n** — UI follows Obsidian language (English / 中文), or set manually
-- **Self-hostable** — Configurable API base URL
+- **API Token help** — Clear steps and a one-click link to get your token from htmlto.link settings
 
 ## Installation
 
@@ -51,8 +51,7 @@ To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
 
 | Setting | Description |
 |---------|-------------|
-| API Base URL | Default `https://htmlto.link`, supports self-hosting |
-| API Token | Optional; guest shares expire in 24 h |
+| API Token | Optional. Empty = guest (24h). Sign in at [htmlto.link/settings](https://htmlto.link/settings), copy API Token, paste here for account-bound longer lifetime |
 | Default Template | memo / popart / traditionalchinese / coilnotebook / … |
 | Theme Class | e.g. `bright-mode`, `candy-mode` |
 | Language | Auto / English / 中文 |

@@ -12,12 +12,12 @@ const dict = {
     settingsTitle: "Share Page",
     settingsDesc:
       "Instantly share your current note as a beautiful webpage and get a public link.",
-    apiUrlName: "API URL",
-    apiUrlDesc:
-      "Default https://htmlto.link. Change it if you self-host the service.",
     apiTokenName: "API Token",
     apiTokenDesc:
-      "Leave empty to publish as a guest (link kept for 24h). Fill in your API Token from the website's Settings → API Token to bind the link to your account for a longer lifetime.",
+      "Leave empty to publish as a guest (link kept for 24 hours). For a longer lifetime: 1) Sign in at htmlto.link 2) Open Settings → API Token 3) Copy the token and paste it here.",
+    apiTokenPlaceholder: "Paste your API Token",
+    apiTokenHelpLink: "Open htmlto.link → Settings to get your Token",
+    apiTokenHelpTooltip: "Open website settings to get API Token",
     defaultTemplateName: "Default template",
     defaultTemplateDesc: "Card template used when publishing.",
     defaultThemeName: "Default theme",
@@ -38,6 +38,9 @@ const dict = {
       "API Token set: the share link belongs to your account and lasts longer per your plan.",
     tipTokenGuest:
       "Without a Token you publish as a guest: the share link is kept for only 24 hours.",
+    tipTokenHowToPrefix: "How to get a Token: open ",
+    tipTokenHowToSuffix:
+      " → sign in → copy API Token → paste above.",
     tipThemes:
       "Only Memo / Pop Art / Coil Notebook support multiple themes; others use a fixed style.",
     tipImages:
@@ -162,11 +165,12 @@ const dict = {
   zh: {
     settingsTitle: "Share Page",
     settingsDesc: "一键将当前笔记分享为精美网页，并复制公开链接。",
-    apiUrlName: "API 地址",
-    apiUrlDesc: "默认 https://htmlto.link，自建部署可改成你的域名。",
     apiTokenName: "API Token",
     apiTokenDesc:
-      "留空则作为游客发布，分享链接仅保留 24 小时。填入网站「设置 → API Token」可让链接归属你的账号并享受更长的有效期。",
+      "留空则作为游客发布，分享链接仅保留 24 小时。获取更长有效期：① 打开 htmlto.link 并登录 ② 进入「设置 → API Token」③ 复制后粘贴到此处。",
+    apiTokenPlaceholder: "粘贴你的 API Token",
+    apiTokenHelpLink: "打开 htmlto.link 设置页获取 Token",
+    apiTokenHelpTooltip: "打开网站设置页获取 API Token",
     defaultTemplateName: "默认模板",
     defaultTemplateDesc: "发布时使用的卡片模板。",
     defaultThemeName: "默认主题",
@@ -185,6 +189,8 @@ const dict = {
     tipsTitle: "说明",
     tipTokenFilled: "已填写 API Token：分享链接归属于你的账号，按套餐享受更长有效期。",
     tipTokenGuest: "未填写 Token 时走游客模式：分享链接仅保留 24 小时。",
+    tipTokenHowToPrefix: "如何获取 Token：打开 ",
+    tipTokenHowToSuffix: " → 登录账号 → 复制 API Token → 粘贴到上方。",
     tipThemes: "仅「备忘录 / 波普艺术 / 线圈笔记本」支持多主题，其他模板为固定样式。",
     tipImages: "本地图片暂不自动上传，建议使用外链图或先上传到图床。",
     tipCommand: "命令面板搜索「分享当前笔记」即可分享当前笔记。",
