@@ -76,7 +76,6 @@ async function doPublish(
 
 	// 记住本次选择，下次默认选中
 	plugin.settings.templateId = options.templateId;
-	plugin.settings.cardWidth = options.cardWidth;
 	plugin.settings.themeClass = themeClass;
 	await plugin.saveSettings();
 
@@ -86,7 +85,6 @@ async function doPublish(
 		title: file.basename,
 		templateId: options.templateId,
 		themeClass,
-		cardWidth: options.cardWidth,
 		slug: existing?.slug,
 		updateToken: existing?.updateToken,
 	});
@@ -173,7 +171,6 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 
 	const initial: PublishOptions = {
 		templateId: plugin.settings.templateId,
-		cardWidth: plugin.settings.cardWidth,
 		themeClass: resolveThemeClassForTemplate(
 			plugin.settings.templateId,
 			plugin.settings.themeClass,

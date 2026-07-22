@@ -1,6 +1,5 @@
 import { App, Modal, Notice, Setting } from "obsidian";
 import {
-	CARD_WIDTH_OPTIONS,
 	TEMPLATE_OPTIONS,
 	getTemplateThemes,
 	hasMultiThemes,
@@ -10,7 +9,6 @@ import { t } from "./i18n";
 
 export interface PublishOptions {
 	templateId: string;
-	cardWidth: number;
 	themeClass: string;
 }
 
@@ -26,7 +24,7 @@ export interface PublishSuccessInfo {
 }
 
 /**
- * 发布弹窗：选模板/宽度/主题 → 发布中 → 成功展示链接 + 复制
+ * 发布弹窗：选模板/主题 → 发布中 → 成功展示链接 + 复制
  * 全程同一弹窗，避免 close 竞态导致“点了没反应”
  */
 export class PublishFlowModal extends Modal {
@@ -139,33 +137,6 @@ export class PublishFlowModal extends Modal {
 			// 无多主题：隐藏主题选择，发布时传空（服务端用模板固定样式）
 			this.draft.themeClass = "";
 		}
-
-		new Setting(contentEl)
-			.setName(t("cardWidthName"))
-			.setDesc(t("modalCardWidthDesc"))
-			.addDropdown((dropdown) => {
-				for (const item of CARD_WIDTH_OPTIONS) {
-					dropdown.addOption(
-						String(item.value),
-						t(item.labelKey),
-					);
-				}
-				const known = CARD_WIDTH_OPTIONS.some(
-					(x) => x.value === this.draft.cardWidth,
-				);
-				if (!known) {
-					dropdown.addOption(
-						String(this.draft.cardWidth),
-						`${this.draft.cardWidth}px（当前）`,
-					);
-				}
-				dropdown
-					.setValue(String(this.draft.cardWidth))
-					.onChange((value) => {
-						this.draft.cardWidth = Number(value) || 440;
-					});
-				dropdown.setDisabled(optionsDisabled);
-			});
 
 		const statusEl = contentEl.createEl("p", {
 			cls: "htmlto-link-publish-status setting-item-description",

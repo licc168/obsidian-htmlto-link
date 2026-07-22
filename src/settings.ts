@@ -1,7 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type HtmltoLinkPlugin from "./main";
 import {
-	CARD_WIDTH_OPTIONS,
 	DEFAULT_SETTINGS,
 	TEMPLATE_OPTIONS,
 	getTemplateThemes,
@@ -132,24 +131,6 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 				});
 		}
 		// 无多主题时不显示主题选项
-
-		new Setting(containerEl)
-			.setName(t("cardWidthName"))
-			.setDesc(t("cardWidthDesc"))
-			.addDropdown((dropdown) => {
-				for (const item of CARD_WIDTH_OPTIONS) {
-					dropdown.addOption(
-						String(item.value),
-						t(item.labelKey),
-					);
-				}
-				dropdown
-					.setValue(String(this.plugin.settings.cardWidth))
-					.onChange(async (value) => {
-						this.plugin.settings.cardWidth = Number(value) || 440;
-						await this.plugin.saveSettings();
-					});
-			});
 
 		new Setting(containerEl)
 			.setName(t("showOptionsName"))

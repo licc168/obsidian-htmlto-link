@@ -17,7 +17,6 @@ export interface CreateShareRequest {
 	templateId: string;
 	title?: string;
 	themeClass?: string;
-	cardWidth?: number;
 	customCss?: string;
 	/** 已有分享的 slug，传入则尝试更新同一 URL */
 	slug?: string;
@@ -48,7 +47,6 @@ function buildBody(
 		content: payload.content,
 		templateId: payload.templateId,
 		title: payload.title || "分享笔记",
-		cardWidth: payload.cardWidth ?? settings.cardWidth,
 	};
 
 	if (payload.themeClass || settings.themeClass) {

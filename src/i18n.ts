@@ -22,9 +22,7 @@ const dict = {
     defaultTemplateDesc: "Card template used when publishing.",
     defaultThemeName: "Default theme",
     defaultThemeDesc: "Color theme for the current template.",
-    cardWidthName: "Card width",
-    cardWidthDesc: "Width of the share card in pixels.",
-    showOptionsName: "Choose template & width on publish",
+    showOptionsName: "Choose template on publish",
     showOptionsDesc:
       "When enabled, a dialog appears each publish. Your last choice is remembered and used as the default next time.",
     copyOnSuccessName: "Auto-copy link on success",
@@ -62,7 +60,6 @@ const dict = {
     templateDesc: "Defaults to your last template; you can change it anytime.",
     themeName: "Theme",
     themeDesc: "This template supports multiple color themes.",
-    modalCardWidthDesc: "Defaults to your last width; you can change it anytime.",
     publishing: "Sharing, please wait…",
     publishFailedPrefix: "Share failed: ",
     cancel: "Cancel",
@@ -161,13 +158,6 @@ const dict = {
     themePink: "Pink",
     themeWarmYellow: "Warm Yellow",
 
-    // card width labels (UI only; API uses number)
-    widthNarrow: "360px (Narrow)",
-    widthDefault: "440px (Default)",
-    widthWide: "520px (Wide)",
-    widthWider: "640px (Wider)",
-    widthUltra: "720px (Ultra)",
-    widthReading: "800px (Reading)",
   },
   zh: {
     settingsTitle: "Share Page",
@@ -181,11 +171,9 @@ const dict = {
     defaultTemplateDesc: "发布时使用的卡片模板。",
     defaultThemeName: "默认主题",
     defaultThemeDesc: "当前模板支持多种主题配色。",
-    cardWidthName: "卡片宽度",
-    cardWidthDesc: "分享页卡片宽度（像素）。",
-    showOptionsName: "发布时选择模板和宽度",
+    showOptionsName: "发布时选择模板",
     showOptionsDesc:
-      "开启后每次发布弹出选择框；选过一次会自动记住，下次默认选中上次的模板和宽度。",
+      "开启后每次发布弹出选择框；选过一次会自动记住，下次默认选中上次的模板。",
     copyOnSuccessName: "发布后自动复制链接",
     copyOnSuccessDesc:
       "成功弹窗打开时，是否同时自动复制链接（弹窗里仍可再点「复制链接」）。",
@@ -216,7 +204,6 @@ const dict = {
     templateDesc: "默认选中上次使用的模板，可随时改。",
     themeName: "主题",
     themeDesc: "该模板支持多种主题配色。",
-    modalCardWidthDesc: "默认选中上次使用的宽度，可随时改。",
     publishing: "正在分享，请稍候…",
     publishFailedPrefix: "分享失败：",
     cancel: "取消",
@@ -312,13 +299,6 @@ const dict = {
     themePink: "粉色",
     themeWarmYellow: "暖黄",
 
-    // card width labels
-    widthNarrow: "360px（窄）",
-    widthDefault: "440px（默认）",
-    widthWide: "520px（宽）",
-    widthWider: "640px（更宽）",
-    widthUltra: "720px（超宽）",
-    widthReading: "800px（阅读宽）",
   },
 };
 

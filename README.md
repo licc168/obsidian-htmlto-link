@@ -9,7 +9,7 @@ Instantly share any Obsidian note as a beautiful webpage via [htmlto.link](https
 - **One-click share** — Ribbon icon or command palette (`Share current note`)
 - **30+ templates** — Memo, Pop Art, Traditional Chinese, Coil Notebook, Cyberpunk, Glassmorphism, and more
 - **Theme variants** — Multiple color themes per template (e.g. Bright / Dark for Memo)
-- **Card width options** — 360 / 440 / 520 / 640 / 720 / 800 px
+- **Responsive layout** — Share pages adapt to screen width automatically
 - **Delete share** — Remove a previously shared link (`Delete share for current note`)
 - **Frontmatter integration** — Automatically writes `share_link` and `share_updated` to note properties after sharing
 - **i18n** — UI follows Obsidian language (English / 中文), or set manually
@@ -42,7 +42,7 @@ Copy `main.js`, `manifest.json`, `styles.css` to your vault's plugin directory.
 
 1. Open any Markdown note.
 2. `Ctrl/Cmd + P` → search **Share current note** (or click the share icon in the ribbon).
-3. Pick a template / width (optional), then confirm.
+3. Pick a template / theme (optional), then confirm.
 4. The share link is copied to your clipboard automatically.
 
 To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
@@ -55,12 +55,11 @@ To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
 | API Token | Optional; guest shares expire in 24 h |
 | Default Template | memo / popart / traditionalchinese / coilnotebook / … |
 | Theme Class | e.g. `bright-mode`, `candy-mode` |
-| Card Width | 360 – 800 px |
 | Language | Auto / English / 中文 |
 | Copy link on success | Enabled by default |
 | Open in browser | Disabled by default |
 | Write share info to note | Writes `share_link` / `share_updated` to frontmatter |
-| Show options on publish | Template & width picker dialog |
+| Show options on publish | Template & theme picker dialog |
 
 ## Privacy & Data
 

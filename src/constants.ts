@@ -16,8 +16,6 @@ export interface HtmltoLinkSettings {
 	templateId: string;
 	/** 主题 class，可为空（接口只认 value，与显示名无关） */
 	themeClass: string;
-	/** 卡片宽度 */
-	cardWidth: number;
 	/** API Token（留空则走游客接口，链接仅保留 24 小时） */
 	apiToken: string;
 	/** 插件界面语言 */
@@ -28,7 +26,7 @@ export interface HtmltoLinkSettings {
 	openInBrowser: boolean;
 	/** 成功后将分享链接和更新时间写入笔记 frontmatter */
 	writeShareToNote: boolean;
-	/** 发布时是否弹出模板/宽度选择框 */
+	/** 发布时是否弹出模板/主题选择框 */
 	showOptionsOnPublish: boolean;
 	/**
 	 * 按笔记路径记录已发布的 slug / updateToken
@@ -42,7 +40,6 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	apiToken: "",
 	templateId: "plain",
 	themeClass: "",
-	cardWidth: 440,
 	language: "auto",
 	copyLinkOnSuccess: true,
 	openInBrowser: false,
@@ -169,12 +166,4 @@ export function resolveThemeClassForTemplate(
 	return getDefaultThemeClass(templateId);
 }
 
-/** value 传给 API；labelKey 仅用于 UI 多语言 */
-export const CARD_WIDTH_OPTIONS: Array<{ value: number; labelKey: string }> = [
-	{ value: 360, labelKey: "widthNarrow" },
-	{ value: 440, labelKey: "widthDefault" },
-	{ value: 520, labelKey: "widthWide" },
-	{ value: 640, labelKey: "widthWider" },
-	{ value: 720, labelKey: "widthUltra" },
-	{ value: 800, labelKey: "widthReading" },
-];
+
