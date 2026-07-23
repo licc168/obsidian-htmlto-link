@@ -47,6 +47,7 @@ function buildBody(
 		content: payload.content,
 		templateId: payload.templateId,
 		title: payload.title || "分享笔记",
+		channel: "obsidian",
 	};
 
 	if (payload.themeClass || settings.themeClass) {
