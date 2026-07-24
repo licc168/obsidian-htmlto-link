@@ -1,7 +1,6 @@
-import { createHash } from 'crypto';
-import { hostname, userInfo } from 'os';
+import { Platform, requestUrl } from "obsidian";
 
-const PING_ENDPOINT = '/api/telemetry/ping';
+const PING_ENDPOINT = "/api/telemetry/ping";
 
 export interface TelemetryConfig {
   /** 插件标识名，如 'htmlto-link-obsidian' */
@@ -14,14 +13,35 @@ export interface TelemetryConfig {
 
 /**
  * 生成匿名机器标识（不可逆哈希，保护隐私）
+ * 桌面端使用 crypto+os，移动端回退到 localStorage
  */
-function getAnonymousId(): string {
-  const raw = [
-    hostname(),
-    userInfo().username,
-    typeof navigator !== 'undefined' ? navigator.userAgent : '',
-  ].join('|');
-  return createHash('sha256').update(raw).digest('hex').slice(0, 16);
+async function getAnonymousId(): Promise<string> {
+  if (Platform.isDesktop) {
+    try {
+      const crypto = await import("crypto");
+      const os = await import("os");
+      const raw = [
+        os.hostname(),
+        os.userInfo().username,
+        Platform.os,
+      ].join("|");
+      return crypto.createHash("sha256").update(raw).digest("hex").slice(0, 16);
+    } catch {
+      // 动态 import 失败时回退
+    }
+  }
+  // 移动端或 import 失败：用 localStorage 存一个随机 ID
+  try {
+    const key = "htmlto-link-machine-id";
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem(key, id);
+    }
+    return id.slice(0, 16);
+  } catch {
+    return "unknown";
+  }
 }
 
 /**
@@ -29,21 +49,27 @@ function getAnonymousId(): string {
  */
 export function sendActivationPing(config: TelemetryConfig): void {
   const url = `${config.apiBaseUrl}${PING_ENDPOINT}`;
-  const body = JSON.stringify({
-    id: getAnonymousId(),
-    ext: config.extName,
-    extVersion: config.extVersion,
-    vscodeVersion: '',
-    platform: process.platform,
-    arch: process.arch,
-    ts: Date.now(),
-  });
 
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body,
+  getAnonymousId().then((id) => {
+    const body = JSON.stringify({
+      id,
+      ext: config.extName,
+      extVersion: config.extVersion,
+      vscodeVersion: "",
+      platform: Platform.os,
+      arch: "",
+      ts: Date.now(),
+    });
+
+    requestUrl({
+      url,
+      method: "POST",
+      contentType: "application/json",
+      body,
+    }).catch(() => {
+      // 静默忽略所有错误，绝不影响用户体验
+    });
   }).catch(() => {
-    // 静默忽略所有错误，绝不影响用户体验
+    // 静默忽略
   });
 }
