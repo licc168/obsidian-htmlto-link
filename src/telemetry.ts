@@ -11,6 +11,15 @@ export interface TelemetryConfig {
   apiBaseUrl: string;
 }
 
+/** 从 Platform 布尔值推导平台字符串 */
+function getPlatformString(): string {
+  if (Platform.isMacOS) return "darwin";
+  if (Platform.isAndroidApp) return "android";
+  if (Platform.isIosApp) return "ios";
+  if (Platform.isDesktopApp) return "win32"; // 桌面非 Mac 大概率 Windows/Linux
+  return "unknown";
+}
+
 /**
  * 生成匿名机器标识（不可逆哈希，保护隐私）
  * 桌面端使用 crypto+os，移动端回退到 localStorage
@@ -23,7 +32,7 @@ async function getAnonymousId(): Promise<string> {
       const raw = [
         os.hostname(),
         os.userInfo().username,
-        Platform.os,
+        getPlatformString(),
       ].join("|");
       return crypto.createHash("sha256").update(raw).digest("hex").slice(0, 16);
     } catch {
@@ -56,7 +65,7 @@ export function sendActivationPing(config: TelemetryConfig): void {
       ext: config.extName,
       extVersion: config.extVersion,
       vscodeVersion: "",
-      platform: Platform.os,
+      platform: getPlatformString(),
       arch: "",
       ts: Date.now(),
     });
