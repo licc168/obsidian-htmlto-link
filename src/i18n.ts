@@ -44,7 +44,9 @@ const dict = {
     tipThemes:
       "Only Memo / Pop Art / Coil Notebook support multiple themes; others use a fixed style.",
     tipImages:
-      "Local images are not uploaded automatically. Use external image links or upload to an image host first.",
+      "Local images (![[...]] / ![](...)) are uploaded to htmlto.link automatically when you share, then rewritten to public URLs. The original note is not modified.",
+    imageUploadPartialFail:
+      "{count} local image(s) failed to upload and were left unchanged.",
     tipCommand: "Run 'Share current note' from the command palette to publish.",
     commandPublish: "Share current note",
     commandDeleteShare: "Delete this shared note",
@@ -192,7 +194,9 @@ const dict = {
     tipTokenHowToPrefix: "如何获取 Token：打开 ",
     tipTokenHowToSuffix: " → 登录账号 → 复制 API Token → 粘贴到上方。",
     tipThemes: "仅「备忘录 / 波普艺术 / 线圈笔记本」支持多主题，其他模板为固定样式。",
-    tipImages: "本地图片暂不自动上传，建议使用外链图或先上传到图床。",
+    tipImages:
+      "分享时会自动上传本地图片（![[...]] / ![](...)）到 htmlto.link，并改写成公开链接；不会修改你 vault 里的原笔记。",
+    imageUploadPartialFail: "有 {count} 张本地图片上传失败，已保留原引用。",
     tipCommand: "命令面板搜索「分享当前笔记」即可分享当前笔记。",
     commandPublish: "分享当前笔记",
     commandDeleteShare: "删除当前笔记的分享",

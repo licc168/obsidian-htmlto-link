@@ -12,6 +12,7 @@ import {
 	type PublishSuccessInfo,
 } from "./publish-modal";
 import { t, timeLocale } from "./i18n";
+import { rewriteLocalImagesForShare } from "./local-images";
 
 /**
  * 去掉 YAML frontmatter，避免把元数据渲染进分享页
@@ -27,7 +28,7 @@ export function stripFrontmatter(markdown: string): string {
  * 简单处理 Obsidian wiki 链接：
  * [[Note]] -> Note
  * [[Note|显示名]] -> 显示名
- * ![[image.png]] 保留原样（本地图暂不上传）
+ * ![[image.png]] 保留原样（由 rewriteLocalImagesForShare 上传后改写）
  */
 export function normalizeWikiLinks(markdown: string): string {
 	return markdown.replace(
@@ -79,9 +80,26 @@ async function doPublish(
 	plugin.settings.themeClass = themeClass;
 	await plugin.saveSettings();
 
+	// 本地图 → OSS 公开 URL（只改分享内容，不改 vault 原笔记）
+	const imageResult = await rewriteLocalImagesForShare(
+		plugin.app,
+		plugin.settings,
+		file,
+		markdown,
+	);
+	const content = imageResult.markdown;
+	if (imageResult.failed.length > 0) {
+		new Notice(
+			t("imageUploadPartialFail", {
+				count: String(imageResult.failed.length),
+			}),
+			6000,
+		);
+	}
+
 	const existing = getNoteShare(plugin, file);
 	const result = await createSharePage(plugin.settings, {
-		content: markdown,
+		content,
 		title: file.basename,
 		templateId: options.templateId,
 		themeClass,
