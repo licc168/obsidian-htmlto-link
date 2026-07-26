@@ -87,6 +87,9 @@ async function doPublish(
 		file,
 		markdown,
 	);
+	if (imageResult.cacheUpdated) {
+		await plugin.saveSettings();
+	}
 	const content = imageResult.markdown;
 	if (imageResult.failed.length > 0) {
 		new Notice(

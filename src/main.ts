@@ -80,6 +80,10 @@ export default class HtmltoLinkPlugin extends Plugin {
 	async loadSettings() {
 		const data = (await this.loadData()) as Partial<HtmltoLinkSettings> | null;
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
+		// 确保 uploadedAssets 始终是对象（旧版本可能没有该字段）
+		if (!this.settings.uploadedAssets || typeof this.settings.uploadedAssets !== "object") {
+			this.settings.uploadedAssets = {};
+		}
 		// 确保 noteShares 始终是对象（旧版本可能没有该字段）
 		if (!this.settings.noteShares || typeof this.settings.noteShares !== "object") {
 			this.settings.noteShares = {};

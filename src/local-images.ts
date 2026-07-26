@@ -1,5 +1,5 @@
 import { requestUrl, type App, type TFile } from "obsidian";
-import type { HtmltoLinkSettings } from "./constants";
+import type { HtmltoLinkSettings, UploadedAssetRecord } from "./constants";
 import { t } from "./i18n";
 
 const MAX_ASSET_BYTES = 20 * 1024 * 1024;
@@ -19,110 +19,88 @@ const EXT_CONTENT_TYPE: Record<string, string> = {
 export interface LocalImageRewriteResult {
 	markdown: string;
 	uploaded: number;
+	cached: number;
 	skipped: number;
 	failed: string[];
+	cacheUpdated: boolean;
 }
 
 interface ImageRef {
-	/** full matched markdown snippet */
 	raw: string;
-	/** path/link target used for vault resolve */
 	target: string;
-	/** alt text if any */
 	alt: string;
 	kind: "wiki" | "md";
 }
 
 function isRemoteOrDataUrl(src: string): boolean {
 	const value = src.trim();
-	return (
-		/^(https?:|data:|blob:|file:|\/\/)/i.test(value) ||
-		value.startsWith("#")
-	);
+	return /^(https?:|data:|blob:|file:|\/\/)/i.test(value) || value.startsWith("#");
 }
 
 function extOf(path: string): string {
 	const base = path.split(/[/\\]/).pop() || path;
 	const idx = base.lastIndexOf(".");
-	if (idx < 0) return "";
-	return base.slice(idx + 1).toLowerCase();
+	return idx < 0 ? "" : base.slice(idx + 1).toLowerCase();
 }
 
 function contentTypeForFile(file: TFile): string {
 	const byExt = EXT_CONTENT_TYPE[extOf(file.path)] || EXT_CONTENT_TYPE[extOf(file.name)];
-	if (byExt) return byExt;
-	// Obsidian extension field is without dot
-	const ext = (file.extension || "").toLowerCase();
-	return EXT_CONTENT_TYPE[ext] || "application/octet-stream";
+	return byExt || EXT_CONTENT_TYPE[(file.extension || "").toLowerCase()] || "application/octet-stream";
 }
 
 function collectImageRefs(markdown: string): ImageRef[] {
 	const refs: ImageRef[] = [];
-
-	// ![[path|size]] or ![[path]]
 	const wikiRe = /!\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g;
 	let match: RegExpExecArray | null;
 	while ((match = wikiRe.exec(markdown)) !== null) {
 		const target = match[1].trim();
-		if (!target || isRemoteOrDataUrl(target)) continue;
-		refs.push({
-			raw: match[0],
-			target,
-			alt: (match[2] || "").trim(),
-			kind: "wiki",
-		});
+		if (target && !isRemoteOrDataUrl(target)) {
+			refs.push({ raw: match[0], target, alt: (match[2] || "").trim(), kind: "wiki" });
+		}
 	}
 
-	// ![alt](path "title") — skip remote
 	const mdRe = /!\[([^\]]*)\]\(\s*<?([^)\s>]+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 	while ((match = mdRe.exec(markdown)) !== null) {
 		const target = match[2].trim();
-		if (!target || isRemoteOrDataUrl(target)) continue;
-		refs.push({
-			raw: match[0],
-			target,
-			alt: (match[1] || "").trim(),
-			kind: "md",
-		});
+		if (target && !isRemoteOrDataUrl(target)) {
+			refs.push({ raw: match[0], target, alt: (match[1] || "").trim(), kind: "md" });
+		}
 	}
-
 	return refs;
 }
 
 function resolveLocalImage(app: App, sourcePath: string, target: string): TFile | null {
 	const dest = app.metadataCache.getFirstLinkpathDest(target, sourcePath);
 	if (dest) return dest;
-
-	// Fallback: direct path lookup
-	const normalized = target.replace(/^\.\//, "");
-	const abstract = app.vault.getAbstractFileByPath(normalized);
-	if (abstract && "extension" in abstract) {
-		return abstract as TFile;
-	}
-	return null;
+	const abstract = app.vault.getAbstractFileByPath(target.replace(/^\.\//, ""));
+	return abstract && "extension" in abstract ? (abstract as TFile) : null;
 }
 
 function isImageFile(file: TFile): boolean {
-	const ext = (file.extension || extOf(file.path)).toLowerCase();
-	return Boolean(EXT_CONTENT_TYPE[ext]);
+	return Boolean(EXT_CONTENT_TYPE[(file.extension || extOf(file.path)).toLowerCase()]);
+}
+
+function getCachedUrl(record: UploadedAssetRecord | undefined, file: TFile): string | null {
+	if (!record || record.mtime !== file.stat.mtime || record.size !== file.stat.size) return null;
+	if (record.temporary) {
+		if (!record.expiresAt || Date.parse(record.expiresAt) <= Date.now()) return null;
+	}
+	return record.url;
 }
 
 async function uploadAsset(
 	settings: HtmltoLinkSettings,
 	file: TFile,
 	data: ArrayBuffer,
-): Promise<string> {
+): Promise<{ url: string; temporary: boolean; expiresAt?: string }> {
 	const base = settings.apiBaseUrl.replace(/\/+$/, "");
 	const apiToken = settings.apiToken.trim();
-	const contentType = contentTypeForFile(file);
 	const headers: Record<string, string> = {
 		Accept: "application/json",
-		"Content-Type": contentType,
+		"Content-Type": contentTypeForFile(file),
 		"X-Filename": file.name,
 	};
-	if (apiToken) {
-		headers.Authorization = `Bearer ${apiToken}`;
-	}
+	if (apiToken) headers.Authorization = `Bearer ${apiToken}`;
 
 	let res;
 	try {
@@ -134,39 +112,35 @@ async function uploadAsset(
 			throw: false,
 		});
 	} catch (err: unknown) {
-		const message = err instanceof Error ? err.message : String(err);
-		throw new Error(t("networkFailed") + message);
+		throw new Error(t("networkFailed") + (err instanceof Error ? err.message : String(err)));
 	}
 
-	let dataJson: { success?: boolean; url?: string; error?: string } = {};
+	let response: {
+		success?: boolean;
+		url?: string;
+		error?: string;
+		temporary?: boolean;
+		expiresAt?: string;
+	} = {};
 	try {
-		dataJson =
-			typeof res.json === "object" && res.json !== null
-				? (res.json as { success?: boolean; url?: string; error?: string })
-				: (JSON.parse(res.text || "{}") as {
-						success?: boolean;
-						url?: string;
-						error?: string;
-					});
+		response = typeof res.json === "object" && res.json !== null ? res.json : JSON.parse(res.text || "{}");
 	} catch {
 		throw new Error(t("invalidJson") + res.status + ")");
 	}
-
-	if (res.status >= 400 || !dataJson.success || !dataJson.url) {
-		throw new Error(dataJson.error || t("httpFailed") + res.status + ")");
+	if (res.status >= 400 || !response.success || !response.url) {
+		throw new Error(response.error || t("httpFailed") + res.status + ")");
 	}
-
-	return dataJson.url;
+	return {
+		url: response.url,
+		temporary: response.temporary ?? !apiToken,
+		expiresAt: response.expiresAt,
+	};
 }
 
 function escapeMdAlt(alt: string): string {
 	return alt.replace(/[[\]]/g, "");
 }
 
-/**
- * Resolve local images in markdown, upload to htmlto.link OSS, rewrite to public URLs.
- * Does not modify the vault note — only the markdown sent to share API.
- */
 export async function rewriteLocalImagesForShare(
 	app: App,
 	settings: HtmltoLinkSettings,
@@ -176,78 +150,79 @@ export async function rewriteLocalImagesForShare(
 ): Promise<LocalImageRewriteResult> {
 	const refs = collectImageRefs(markdown);
 	if (refs.length === 0) {
-		return { markdown, uploaded: 0, skipped: 0, failed: [] };
+		return { markdown, uploaded: 0, cached: 0, skipped: 0, failed: [], cacheUpdated: false };
 	}
 
 	const urlByPath = new Map<string, string>();
-	const failed: string[] = [];
-	let uploaded = 0;
-	let skipped = 0;
-
-	// Unique targets in document order
-	const uniqueTargets: string[] = [];
-	const seen = new Set<string>();
-	for (const ref of refs) {
-		const key = ref.target;
-		if (seen.has(key)) continue;
-		seen.add(key);
-		uniqueTargets.push(key);
-	}
-
+	const uniqueTargets = [...new Set(refs.map((ref) => ref.target))];
 	let done = 0;
-	for (const target of uniqueTargets) {
-		const file = resolveLocalImage(app, sourceFile.path, target);
-		if (!file || !isImageFile(file)) {
-			skipped += 1;
-			done += 1;
-			onProgress?.(done, uniqueTargets.length);
+	const results = await Promise.all(
+		uniqueTargets.map(async (target) => {
+			const file = resolveLocalImage(app, sourceFile.path, target);
+			if (!file || !isImageFile(file)) return { target, skipped: true } as const;
+			const cachedUrl = getCachedUrl(settings.uploadedAssets[file.path], file);
+			if (cachedUrl) return { target, file, url: cachedUrl, cached: true } as const;
+			try {
+				const binary = await app.vault.readBinary(file);
+				if (!binary.byteLength) return { target, skipped: true } as const;
+				if (binary.byteLength > MAX_ASSET_BYTES) {
+					return { target, failed: `${file.name} (>20MB)` } as const;
+				}
+				const uploaded = await uploadAsset(settings, file, binary);
+				return { target, file, url: uploaded.url, uploaded } as const;
+			} catch (err: unknown) {
+				return {
+					target,
+					failed: `${file.name}: ${err instanceof Error ? err.message : String(err)}`,
+				} as const;
+			} finally {
+				done += 1;
+				onProgress?.(done, uniqueTargets.length);
+			}
+		}),
+	);
+
+	let uploaded = 0;
+	let cached = 0;
+	let skipped = 0;
+	let cacheUpdated = false;
+	const failed: string[] = [];
+	for (const result of results) {
+		if ("failed" in result && typeof result.failed === "string") {
+			failed.push(result.failed);
 			continue;
 		}
-
-		try {
-			const binary = await app.vault.readBinary(file);
-			if (!binary.byteLength) {
-				skipped += 1;
-			} else if (binary.byteLength > MAX_ASSET_BYTES) {
-				failed.push(`${file.name} (>5MB)`);
-			} else {
-				const url = await uploadAsset(settings, file, binary);
-				urlByPath.set(target, url);
-				// also key by path for alternate refs
-				urlByPath.set(file.path, url);
-				urlByPath.set(file.name, url);
-				uploaded += 1;
-			}
-		} catch (err: unknown) {
-			const message = err instanceof Error ? err.message : String(err);
-			failed.push(`${file.name}: ${message}`);
+		if ("skipped" in result) {
+			skipped += 1;
+			continue;
 		}
-
-		done += 1;
-		onProgress?.(done, uniqueTargets.length);
-	}
-
-	if (urlByPath.size === 0) {
-		return { markdown, uploaded, skipped, failed };
+		urlByPath.set(result.target, result.url);
+		urlByPath.set(result.file.path, result.url);
+		urlByPath.set(result.file.name, result.url);
+		if ("cached" in result) {
+			cached += 1;
+		} else {
+			uploaded += 1;
+			cacheUpdated = true;
+			settings.uploadedAssets[result.file.path] = {
+				url: result.url,
+				mtime: result.file.stat.mtime,
+				size: result.file.stat.size,
+				uploadedAt: new Date().toISOString(),
+				temporary: result.uploaded.temporary,
+				expiresAt: result.uploaded.expiresAt,
+			};
+		}
 	}
 
 	let next = markdown;
-
-	// Replace longer raw strings first to reduce partial collisions
-	const sortedRefs = [...refs].sort((a, b) => b.raw.length - a.raw.length);
-	for (const ref of sortedRefs) {
-		const url =
-			urlByPath.get(ref.target) ||
-			urlByPath.get(ref.target.replace(/^\.\//, ""));
+	for (const ref of [...refs].sort((a, b) => b.raw.length - a.raw.length)) {
+		const url = urlByPath.get(ref.target) || urlByPath.get(ref.target.replace(/^\.\//, ""));
 		if (!url) continue;
-
-		const alt =
-			ref.kind === "wiki"
-				? escapeMdAlt(ref.alt && !/^\d+$/.test(ref.alt) ? ref.alt : "")
-				: escapeMdAlt(ref.alt);
-		const replacement = `![${alt}](${url})`;
-		next = next.split(ref.raw).join(replacement);
+		const alt = ref.kind === "wiki"
+			? escapeMdAlt(ref.alt && !/^\d+$/.test(ref.alt) ? ref.alt : "")
+			: escapeMdAlt(ref.alt);
+		next = next.split(ref.raw).join(`![${alt}](${url})`);
 	}
-
-	return { markdown: next, uploaded, skipped, failed };
+	return { markdown: next, uploaded, cached, skipped, failed, cacheUpdated };
 }

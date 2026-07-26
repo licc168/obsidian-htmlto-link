@@ -1,3 +1,13 @@
+/** 已上传本地图的缓存记录，文件未变化时可直接复用公开 URL */
+export interface UploadedAssetRecord {
+	url: string;
+	mtime: number;
+	size: number;
+	uploadedAt: string;
+	temporary: boolean;
+	expiresAt?: string;
+}
+
 /** 单篇笔记对应的分享记录（同一笔记复用同一 URL） */
 export interface NoteShareRecord {
 	slug: string;
@@ -29,6 +39,11 @@ export interface HtmltoLinkSettings {
 	/** 发布时是否弹出模板/主题选择框 */
 	showOptionsOnPublish: boolean;
 	/**
+	 * 按 vault 文件路径缓存已上传图片，文件未变化时直接复用公开 URL
+	 * key = TFile.path
+	 */
+	uploadedAssets: Record<string, UploadedAssetRecord>;
+	/**
 	 * 按笔记路径记录已发布的 slug / updateToken
 	 * key = TFile.path
 	 */
@@ -45,6 +60,7 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	openInBrowser: false,
 	writeShareToNote: true,
 	showOptionsOnPublish: true,
+	uploadedAssets: {},
 	noteShares: {},
 };
 
