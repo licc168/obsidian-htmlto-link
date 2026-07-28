@@ -91,28 +91,41 @@ export class PublishFlowModal extends Modal {
 		const multiTheme = hasMultiThemes(this.draft.templateId);
 		const themes = getTemplateThemes(this.draft.templateId);
 
-		new Setting(contentEl)
-			.setName(t("templateName"))
-			.setDesc(t("templateDesc"))
-			.addDropdown((dropdown) => {
-				for (const item of TEMPLATE_OPTIONS) {
-					// id 传给 API；显示名走 i18n
-					dropdown.addOption(item.id, t(item.nameKey));
-				}
-				dropdown.setValue(this.draft.templateId).onChange((value) => {
-					this.draft.templateId = value;
-					// 切换模板时同步主题（有多主题用默认/兼容值，无则清空）
-					this.draft.themeClass = resolveThemeClassForTemplate(
-						value,
-						this.draft.themeClass,
-					);
-					// 主题选项依赖模板，需要重绘
-					if (this.phase === "options" || this.phase === "error") {
-						this.render();
-					}
-				});
-				dropdown.setDisabled(optionsDisabled);
+		const templateSetting = new Setting(contentEl)
+			.setName(t("templateName"));
+
+		const descFragment = createFragment((frag) => {
+			frag.appendText(t("templateDesc") + " ");
+			const previewLink = frag.createEl("a", {
+				text: "🔍 " + t("previewTemplateLink"),
+				href: "https://htmlto.link/editor",
+				cls: "htmlto-link-template-preview-link",
 			});
+			previewLink.target = "_blank";
+			previewLink.rel = "noopener noreferrer";
+		});
+
+		templateSetting.setDesc(descFragment);
+
+		templateSetting.addDropdown((dropdown) => {
+			for (const item of TEMPLATE_OPTIONS) {
+				// id 传给 API；显示名走 i18n
+				dropdown.addOption(item.id, t(item.nameKey));
+			}
+			dropdown.setValue(this.draft.templateId).onChange((value) => {
+				this.draft.templateId = value;
+				// 切换模板时同步主题（有多主题用默认/兼容值，无则清空）
+				this.draft.themeClass = resolveThemeClassForTemplate(
+					value,
+					this.draft.themeClass,
+				);
+				// 主题选项依赖模板，需要重绘
+				if (this.phase === "options" || this.phase === "error") {
+					this.render();
+				}
+			});
+			dropdown.setDisabled(optionsDisabled);
+		});
 
 		if (multiTheme) {
 			new Setting(contentEl)

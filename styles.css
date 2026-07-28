@@ -71,3 +71,10 @@
 	font-size: 0.85em;
 	line-height: 1.4;
 }
+
+.htmlto-link-template-preview-link {
+	color: var(--text-accent);
+	text-decoration: underline;
+	margin-left: 6px;
+	white-space: nowrap;
+}
