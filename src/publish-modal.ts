@@ -274,6 +274,20 @@ function renderSuccessContent(
 		statusEl.setText(t("clickToCopy"));
 	}
 
+	try {
+		const parsed = new URL(info.url);
+		const code = parsed.pathname.replace(/^\//, "").split("/")[0];
+		if (code) {
+			contentEl.createEl("a", {
+				text: t("renewLink"),
+				href: `${parsed.origin}/pricing?deployment=${encodeURIComponent(code)}`,
+				cls: "htmlto-link-success-renew",
+			});
+		}
+	} catch {
+		// ignore malformed url
+	}
+
 	const actions = contentEl.createDiv({
 		cls: "htmlto-link-publish-actions",
 	});

@@ -25,6 +25,13 @@
 	margin: 12px 0 6px;
 }
 
+.htmlto-link-publish-modal .htmlto-link-success-renew,
+.htmlto-link-success-modal .htmlto-link-success-renew {
+	display: inline-block;
+	margin: 10px 0 2px;
+	font-size: 0.9em;
+}
+
 .htmlto-link-publish-modal .htmlto-link-success-url-row,
 .htmlto-link-success-modal .htmlto-link-success-url-row {
 	display: flex;
