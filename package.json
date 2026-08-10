@@ -1,6 +1,6 @@
 {
 	"name": "htmlto-link-obsidian",
-	"version": "0.1.12",
+	"version": "0.1.13",
 	"description": "Instantly share an Obsidian note as a beautiful webpage and copy the public link",
 	"main": "main.js",
 	"scripts": {
