@@ -47,9 +47,11 @@ const dict = {
       "Local images (![[...]] / ![](...)) are uploaded to htmlto.link automatically when you share, then rewritten to public URLs. The original note is not modified.",
     imageUploadPartialFail:
       "{count} local image(s) failed to upload and were left unchanged.",
-    tipCommand: "Run 'Share current note' from the command palette to publish.",
+		tipCommand: "Share from the command palette, the left ribbon, or right-click a Markdown file.",
     commandPublish: "Share current note",
     commandDeleteShare: "Delete this shared note",
+    menuPublish: "Share this note",
+    menuDeleteShare: "Delete share link",
     commandSettings: "Open settings",
     languageName: "Language",
     languageDesc:
@@ -199,9 +201,11 @@ const dict = {
     tipImages:
       "分享时会自动上传本地图片（![[...]] / ![](...)）到 htmlto.link，并改写成公开链接；不会修改你 vault 里的原笔记。",
     imageUploadPartialFail: "有 {count} 张本地图片上传失败，已保留原引用。",
-    tipCommand: "命令面板搜索「分享当前笔记」即可分享当前笔记。",
+    tipCommand: "可用命令面板、左侧功能区，或在文件列表里右键 Markdown 笔记来分享。",
     commandPublish: "分享当前笔记",
     commandDeleteShare: "删除当前笔记的分享",
+    menuPublish: "分享这篇笔记",
+    menuDeleteShare: "删除分享链接",
     commandSettings: "打开设置",
     languageName: "界面语言",
     languageDesc:

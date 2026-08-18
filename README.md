@@ -6,7 +6,8 @@ Instantly share any Obsidian note as a beautiful webpage via [htmlto.link](https
 
 ## Features
 
-- **One-click share** — Ribbon icon or command palette (`Share current note`)
+- **One-click share** — Ribbon, command palette (`Share current note`), or right-click a file
+- **Same URL on update** — Re-sharing a note updates the existing link; rename or move the file and it still matches
 - **30+ templates** — Memo, Pop Art, Traditional Chinese, Coil Notebook, Cyberpunk, Glassmorphism, and more
 - **Theme variants** — Multiple color themes per template (e.g. Bright / Dark for Memo)
 - **Responsive layout** — Share pages adapt to screen width automatically
@@ -41,8 +42,8 @@ Copy `main.js`, `manifest.json`, `styles.css` to your vault's plugin directory.
 ## Usage
 
 1. Open any Markdown note.
-2. `Ctrl/Cmd + P` → search **Share current note** (or click the share icon in the ribbon).
-3. Pick a template / theme (optional), then confirm.
+2. `Ctrl/Cmd + P` → search **Share current note** (or click the share icon in the ribbon, or right-click the note in the file list).
+3. Pick a template / theme (optional), then confirm. Unsaved edits in the editor are included.
 4. The share link is copied to your clipboard automatically.
 
 To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.

@@ -1,9 +1,15 @@
-import { MarkdownView, Plugin } from "obsidian";
+import { MarkdownView, Plugin, TFile } from "obsidian";
 import { DEFAULT_SETTINGS, type HtmltoLinkSettings } from "./constants";
 import { HtmltoLinkSettingTab } from "./settings";
-import { publishActiveNote, deleteShareActiveNote } from "./publish";
+import {
+	publishActiveNote,
+	publishNote,
+	deleteShareActiveNote,
+	deleteShareNote,
+} from "./publish";
 import { initI18n, t } from "./i18n";
 import { sendActivationPing } from "./telemetry";
+import { handleVaultDelete, handleVaultRename } from "./share-index";
 
 export default class HtmltoLinkPlugin extends Plugin {
 	settings!: HtmltoLinkSettings;
@@ -64,6 +70,40 @@ export default class HtmltoLinkPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new HtmltoLinkSettingTab(this.app, this));
+
+		this.registerEvent(
+			this.app.vault.on("rename", (file, oldPath) => {
+				void handleVaultRename(this, file, oldPath);
+			}),
+		);
+		this.registerEvent(
+			this.app.vault.on("delete", (file) => {
+				void handleVaultDelete(this, file);
+			}),
+		);
+		this.registerEvent(
+			this.app.workspace.on("file-menu", (menu, file) => {
+				if (!(file instanceof TFile) || file.extension !== "md") return;
+				menu.addItem((item) => {
+					item
+						.setTitle(t("menuPublish"))
+						.setIcon("share")
+						.onClick(() => {
+							void publishNote(this, file);
+						});
+				});
+				if (this.settings.noteShares?.[file.path]) {
+					menu.addItem((item) => {
+						item
+							.setTitle(t("menuDeleteShare"))
+							.setIcon("trash")
+							.onClick(() => {
+								void deleteShareNote(this, file);
+							});
+					});
+				}
+			}),
+		);
 
 		// plugin loaded
 	}

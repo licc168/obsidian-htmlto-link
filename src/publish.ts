@@ -170,19 +170,49 @@ async function doPublish(
 
 export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void> {
 	const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
-	if (!view) {
-		new Notice(t("errNoView"));
+	if (!view?.file) {
+		new Notice(view ? t("errNoFile") : t("errNoView"));
 		return;
 	}
+	await publishNote(plugin, view.file);
+}
 
-	const file = view.file;
-	if (!file) {
+/**
+ * 当前笔记若正在编辑器里打开，用编辑器内容（含未保存修改）；
+ * 否则读磁盘上的文件。
+ */
+export async function readNoteMarkdown(
+	plugin: HtmltoLinkPlugin,
+	file: TFile,
+): Promise<string> {
+	const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
+	if (view?.file?.path === file.path && view.editor) {
+		return view.editor.getValue();
+	}
+	const leaves = plugin.app.workspace.getLeavesOfType("markdown");
+	for (const leaf of leaves) {
+		const mdView = leaf.view;
+		if (
+			mdView instanceof MarkdownView &&
+			mdView.file?.path === file.path &&
+			mdView.editor
+		) {
+			return mdView.editor.getValue();
+		}
+	}
+	return plugin.app.vault.read(file);
+}
+
+export async function publishNote(
+	plugin: HtmltoLinkPlugin,
+	file: TFile,
+): Promise<void> {
+	if (file.extension !== "md") {
 		new Notice(t("errNoFile"));
 		return;
 	}
 
-	// 优先读磁盘最新内容，避免未保存编辑丢失
-	const raw = await plugin.app.vault.read(file);
+	const raw = await readNoteMarkdown(plugin, file);
 	const markdown = prepareMarkdown(raw);
 
 	if (!markdown) {
@@ -198,7 +228,6 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 		),
 	};
 
-	// 开启「发布时选择」：同一弹窗完成 选模板 → 发布中 → 成功/复制
 	if (plugin.settings.showOptionsOnPublish) {
 		const guestWarning = plugin.settings.apiToken.trim()
 			? undefined
@@ -213,7 +242,6 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 		return;
 	}
 
-	// 关闭选择弹窗：直接发布，成功后弹出结果框
 	const notice = new Notice(t("publishingNotice"), 0);
 	try {
 		const info = await doPublish(plugin, file, markdown, initial);
@@ -223,7 +251,6 @@ export async function publishActiveNote(plugin: HtmltoLinkPlugin): Promise<void>
 		notice.hide();
 		const message = err instanceof Error ? err.message : String(err);
 		new Notice(t("publishFailed") + message, 10000);
-		// publish failed silently
 	}
 }
 
@@ -274,16 +301,17 @@ export async function deleteShareActiveNote(
 	plugin: HtmltoLinkPlugin,
 ): Promise<void> {
 	const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
-	if (!view) {
-		new Notice(t("errNoView"));
+	if (!view?.file) {
+		new Notice(view ? t("errNoFile") : t("errNoView"));
 		return;
 	}
+	await deleteShareNote(plugin, view.file);
+}
 
-	const file = view.file;
-	if (!file) {
-		new Notice(t("errNoFile"));
-		return;
-	}
+export async function deleteShareNote(
+	plugin: HtmltoLinkPlugin,
+	file: TFile,
+): Promise<void> {
 
 	const record = getNoteShare(plugin, file);
 	if (!record) {

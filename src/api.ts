@@ -46,7 +46,7 @@ function buildBody(
 	const body: Record<string, unknown> = {
 		content: payload.content,
 		templateId: payload.templateId,
-		title: payload.title || "分享笔记",
+		title: payload.title || "Shared note",
 		channel: "obsidian",
 	};
 
