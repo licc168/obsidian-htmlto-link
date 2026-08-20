@@ -31,13 +31,41 @@ export function stripFrontmatter(markdown: string): string {
  * ![[image.png]] 保留原样（由 rewriteLocalImagesForShare 上传后改写）
  */
 export function normalizeWikiLinks(markdown: string): string {
-	return markdown.replace(
-		/(!)?\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g,
-		(full, bang, target, alias) => {
-			if (bang) return full;
-			return alias?.trim() || target.trim();
-		},
-	);
+	let fenceCharacter = "";
+	let fenceLength = 0;
+
+	return markdown
+		.split(/(\r?\n)/)
+		.map((part) => {
+			if (/^\r?\n$/.test(part)) return part;
+
+			const fence = part.match(/^[ \t]*(`{3,}|~{3,})/);
+			if (fence) {
+				const marker = fence[1];
+				if (!fenceCharacter) {
+					fenceCharacter = marker[0];
+					fenceLength = marker.length;
+				} else if (
+					marker[0] === fenceCharacter &&
+					marker.length >= fenceLength
+				) {
+					fenceCharacter = "";
+					fenceLength = 0;
+				}
+				return part;
+			}
+
+			if (fenceCharacter) return part;
+
+			return part.replace(
+				/(!)?\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g,
+				(full, bang, target, alias) => {
+					if (bang) return full;
+					return alias?.trim() || target.trim();
+				},
+			);
+		})
+		.join("");
 }
 
 export function prepareMarkdown(raw: string): string {
