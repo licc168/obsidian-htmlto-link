@@ -1,6 +1,7 @@
-import { requestUrl, type App, type TFile } from "obsidian";
+import { requestUrl, TFile, type App, type RequestUrlResponse } from "obsidian";
 import type { HtmltoLinkSettings, UploadedAssetRecord } from "./constants";
 import { t } from "./i18n";
+import { optionalBoolean, optionalString, parseJsonObject } from "./json";
 
 const MAX_ASSET_BYTES = 20 * 1024 * 1024;
 
@@ -73,7 +74,7 @@ function resolveLocalImage(app: App, sourcePath: string, target: string): TFile 
 	const dest = app.metadataCache.getFirstLinkpathDest(target, sourcePath);
 	if (dest) return dest;
 	const abstract = app.vault.getAbstractFileByPath(target.replace(/^\.\//, ""));
-	return abstract && "extension" in abstract ? (abstract as TFile) : null;
+	return abstract instanceof TFile ? abstract : null;
 }
 
 function isImageFile(file: TFile): boolean {
@@ -102,7 +103,7 @@ async function uploadAsset(
 	};
 	if (apiToken) headers.Authorization = `Bearer ${apiToken}`;
 
-	let res;
+	let res: RequestUrlResponse;
 	try {
 		res = await requestUrl({
 			url: `${base}/api/assets`,
@@ -115,25 +116,23 @@ async function uploadAsset(
 		throw new Error(t("networkFailed") + (err instanceof Error ? err.message : String(err)));
 	}
 
-	let response: {
-		success?: boolean;
-		url?: string;
-		error?: string;
-		temporary?: boolean;
-		expiresAt?: string;
-	} = {};
+	let response: Record<string, unknown>;
 	try {
-		response = typeof res.json === "object" && res.json !== null ? res.json : JSON.parse(res.text || "{}");
+		response = parseJsonObject(res.text);
 	} catch {
 		throw new Error(t("invalidJson") + res.status + ")");
 	}
-	if (res.status >= 400 || !response.success || !response.url) {
-		throw new Error(response.error || t("httpFailed") + res.status + ")");
+	const success = optionalBoolean(response, "success");
+	const url = optionalString(response, "url");
+	if (res.status >= 400 || !success || !url) {
+		throw new Error(
+			optionalString(response, "error") || t("httpFailed") + res.status + ")",
+		);
 	}
 	return {
-		url: response.url,
-		temporary: response.temporary ?? !apiToken,
-		expiresAt: response.expiresAt,
+		url,
+		temporary: optionalBoolean(response, "temporary") ?? !apiToken,
+		expiresAt: optionalString(response, "expiresAt"),
 	};
 }
 

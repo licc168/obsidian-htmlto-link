@@ -1,4 +1,4 @@
-import { Platform, requestUrl } from "obsidian";
+import { Platform, requestUrl, type App } from "obsidian";
 
 const PING_ENDPOINT = "/api/telemetry/ping";
 
@@ -16,50 +16,33 @@ function getPlatformString(): string {
   if (Platform.isMacOS) return "darwin";
   if (Platform.isAndroidApp) return "android";
   if (Platform.isIosApp) return "ios";
-  if (Platform.isDesktopApp) return "win32"; // 桌面非 Mac 大概率 Windows/Linux
+  if (Platform.isWin) return "win32";
+  if (Platform.isLinux) return "linux";
   return "unknown";
 }
 
 /**
- * 生成匿名机器标识（不可逆哈希，保护隐私）
- * 桌面端使用 crypto+os，移动端回退到 localStorage
+ * 生成 vault 专属的匿名标识。使用 Obsidian 的存储封装，避免跨 vault 共享。
  */
-async function getAnonymousId(): Promise<string> {
-  if (Platform.isDesktop) {
-    try {
-      const crypto = await import("crypto");
-      const os = await import("os");
-      const raw = [
-        os.hostname(),
-        os.userInfo().username,
-        getPlatformString(),
-      ].join("|");
-      return crypto.createHash("sha256").update(raw).digest("hex").slice(0, 16);
-    } catch {
-      // 动态 import 失败时回退
-    }
+function getAnonymousId(app: App): string {
+  const key = "htmlto-link-anonymous-id";
+  const stored: unknown = app.loadLocalStorage(key);
+  if (typeof stored === "string" && stored.length >= 16) {
+    return stored.slice(0, 16);
   }
-  // 移动端或 import 失败：用 localStorage 存一个随机 ID
-  try {
-    const key = "htmlto-link-machine-id";
-    let id = localStorage.getItem(key);
-    if (!id) {
-      id = Math.random().toString(36).slice(2) + Date.now().toString(36);
-      localStorage.setItem(key, id);
-    }
-    return id.slice(0, 16);
-  } catch {
-    return "unknown";
-  }
+
+  const id = `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+  app.saveLocalStorage(key, id);
+  return id.slice(0, 16);
 }
 
 /**
  * 发送一次激活 ping（fire-and-forget，不阻塞插件启动）
  */
-export function sendActivationPing(config: TelemetryConfig): void {
+export function sendActivationPing(app: App, config: TelemetryConfig): void {
   const url = `${config.apiBaseUrl}${PING_ENDPOINT}`;
-
-  getAnonymousId().then((id) => {
+  try {
+    const id = getAnonymousId(app);
     const body = JSON.stringify({
       id,
       ext: config.extName,
@@ -78,7 +61,7 @@ export function sendActivationPing(config: TelemetryConfig): void {
     }).catch(() => {
       // 静默忽略所有错误，绝不影响用户体验
     });
-  }).catch(() => {
-    // 静默忽略
-  });
+  } catch {
+    // 本地存储不可用时不发送遥测，绝不影响插件启动
+  }
 }

@@ -1,6 +1,11 @@
-import { requestUrl } from "obsidian";
+import { requestUrl, type RequestUrlResponse } from "obsidian";
 import type { HtmltoLinkSettings } from "./constants";
 import { t } from "./i18n";
+import {
+	optionalBoolean,
+	optionalString,
+	parseJsonObject,
+} from "./json";
 
 /** 区分网络错误与业务错误，便于上层决定是否回退到新建 */
 class ApiError extends Error {
@@ -36,6 +41,25 @@ export interface CreateShareResponse {
 	/** 链接过期时间（ISO 字符串） */
 	expiresAt?: string;
 	error?: string;
+}
+
+export interface CreateShareResult extends CreateShareResponse {
+	url: string;
+}
+
+function parseCreateShareResponse(text: string): CreateShareResponse {
+	const object = parseJsonObject(text);
+	return {
+		success: optionalBoolean(object, "success"),
+		ok: optionalBoolean(object, "ok"),
+		slug: optionalString(object, "slug"),
+		url: optionalString(object, "url"),
+		updateToken: optionalString(object, "updateToken"),
+		updated: optionalBoolean(object, "updated"),
+		temporary: optionalBoolean(object, "temporary"),
+		expiresAt: optionalString(object, "expiresAt"),
+		error: optionalString(object, "error"),
+	};
 }
 
 function buildBody(
@@ -77,7 +101,7 @@ async function requestJson(
 		headers["Authorization"] = `Bearer ${apiToken}`;
 	}
 
-	let res;
+	let res: RequestUrlResponse;
 	try {
 		res = await requestUrl({
 			url,
@@ -91,11 +115,9 @@ async function requestJson(
 		throw new ApiError(t("networkFailed") + message, true);
 	}
 
-	let data: CreateShareResponse = {};
+	let data: CreateShareResponse;
 	try {
-		data = (typeof res.json === "object" && res.json !== null
-			? res.json
-			: JSON.parse(res.text || "{}")) as CreateShareResponse;
+		data = parseCreateShareResponse(res.text);
 	} catch {
 		throw new ApiError(t("invalidJson") + res.status + ")", false);
 	}
@@ -107,22 +129,18 @@ function finalizeResponse(
 	base: string,
 	status: number,
 	data: CreateShareResponse,
-): CreateShareResponse {
+): CreateShareResult {
 	const ok = Boolean(data.success || data.ok);
 	if (status >= 400 || !ok) {
 		throw new ApiError(data.error || t("httpFailed") + status + ")", false);
 	}
 
-	if (!data.url) {
-		if (data.slug) {
-			// 与网站 buildPublicShareUrl 一致：https://htmlto.link/{slug}
-			data.url = `${base}/${data.slug}`;
-		} else {
-			throw new ApiError(t("noUrl"), false);
-		}
+	const url = data.url ?? (data.slug ? `${base}/${data.slug}` : undefined);
+	if (!url) {
+		throw new ApiError(t("noUrl"), false);
 	}
 
-	return data;
+	return { ...data, url };
 }
 
 /**
@@ -146,7 +164,7 @@ export async function deleteSharePage(
 		headers["Authorization"] = `Bearer ${apiToken}`;
 	}
 
-	let res;
+	let res: RequestUrlResponse;
 	try {
 		res = await requestUrl({
 			url,
@@ -163,10 +181,9 @@ export async function deleteSharePage(
 	if (res.status >= 400) {
 		let errMsg = t("httpFailed") + res.status + ")";
 		try {
-			const data = typeof res.json === "object" && res.json !== null
-				? res.json
-				: JSON.parse(res.text || "{}");
-			if (data?.error) errMsg = data.error;
+			const data = parseJsonObject(res.text);
+			const serverMessage = optionalString(data, "error");
+			if (serverMessage) errMsg = serverMessage;
 		} catch {
 			// ignore parse error
 		}
@@ -182,7 +199,7 @@ export async function deleteSharePage(
 export async function createSharePage(
 	settings: HtmltoLinkSettings,
 	payload: CreateShareRequest,
-): Promise<CreateShareResponse> {
+): Promise<CreateShareResult> {
 	const base = settings.apiBaseUrl.replace(/\/+$/, "");
 	const apiToken = settings.apiToken.trim();
 

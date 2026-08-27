@@ -63,8 +63,11 @@ To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
 
 ## Privacy & Data
 
-- The plugin sends the **note content** (Markdown) to the configured API server to generate a share page.
-- No data is collected beyond what is needed for the share request.
+- **Network access:** When you publish, the plugin sends the note's Markdown and referenced local images to the configured API server to create or update the share page. Deleting a share also contacts that server.
+- **Activation ping:** When the plugin loads, it sends the plugin version, platform, timestamp, and a random vault-specific anonymous ID to the configured API server. It never includes note content, note paths, vault names, usernames, or hostnames.
+- **Clipboard access:** After a successful publish, the plugin writes only the resulting public URL to the clipboard when “Copy link on success” is enabled.
+- **Vault access:** The plugin reads only the note being shared and its referenced local images. It writes `share_link` and `share_updated` to that note only when the corresponding setting is enabled.
+- **Local data:** Settings, share-update tokens, and image cache records are stored through Obsidian's plugin data API. The anonymous activation ID is stored through Obsidian's vault-scoped local storage API.
 - Guest shares expire after 24 hours.
 
 ## Development

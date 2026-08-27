@@ -248,7 +248,7 @@ function renderSuccessContent(
 		});
 	}
 
-	contentEl.createEl("div", {
+	contentEl.createDiv({
 		text: t("shareLinkLabel"),
 		cls: "htmlto-link-success-label",
 	});
@@ -258,7 +258,7 @@ function renderSuccessContent(
 	});
 	const urlInput = urlRow.createEl("input", {
 		cls: "htmlto-link-success-url",
-	}) as HTMLInputElement;
+	});
 	urlInput.type = "text";
 	urlInput.readOnly = true;
 	urlInput.value = info.url;

@@ -20,7 +20,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 		initI18n(this.app, this.settings.language ?? "auto");
 
 		// 发送激活 ping（fire-and-forget，不阻塞启动）
-		sendActivationPing({
+		sendActivationPing(this.app, {
 			extName: "htmlto-link-obsidian",
 			extVersion: this.manifest.version,
 			apiBaseUrl: this.settings.apiBaseUrl,

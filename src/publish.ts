@@ -59,7 +59,12 @@ export function normalizeWikiLinks(markdown: string): string {
 
 			return part.replace(
 				/(!)?\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g,
-				(full, bang, target, alias) => {
+				(
+					full: string,
+					bang: string | undefined,
+					target: string,
+					alias: string | undefined,
+				) => {
 					if (bang) return full;
 					return alias?.trim() || target.trim();
 				},
@@ -138,7 +143,7 @@ async function doPublish(
 		updateToken: existing?.updateToken,
 	});
 
-	const url = result.url!;
+	const url = result.url;
 	const slug = result.slug || existing?.slug;
 	const updateToken = result.updateToken || existing?.updateToken;
 	const updated = Boolean(result.updated);
@@ -299,7 +304,7 @@ async function writeShareToFrontmatter(
 	const tz = `${sign}${pad(Math.floor(offset / 60))}:${pad(offset % 60)}`;
 	const iso = now.toISOString().replace("Z", tz);
 
-	await plugin.app.fileManager.processFrontMatter(file, (fm) => {
+	await plugin.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
 		fm["share_link"] = url;
 		fm["share_updated"] = iso;
 	});
@@ -312,7 +317,7 @@ async function removeShareFromFrontmatter(
 	plugin: HtmltoLinkPlugin,
 	file: TFile,
 ): Promise<void> {
-	await plugin.app.fileManager.processFrontMatter(file, (fm) => {
+	await plugin.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
 		delete fm["share_link"];
 		delete fm["share_updated"];
 	});
