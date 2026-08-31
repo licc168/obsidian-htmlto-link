@@ -8,7 +8,6 @@ import {
 	deleteShareNote,
 } from "./publish";
 import { initI18n, t } from "./i18n";
-import { sendActivationPing } from "./telemetry";
 import { handleVaultDelete, handleVaultRename } from "./share-index";
 
 export default class HtmltoLinkPlugin extends Plugin {
@@ -18,13 +17,6 @@ export default class HtmltoLinkPlugin extends Plugin {
 		await this.loadSettings();
 		// 按设置初始化语言（auto 跟随 Obsidian，也可手动 en/zh）
 		initI18n(this.app, this.settings.language ?? "auto");
-
-		// 发送激活 ping（fire-and-forget，不阻塞启动）
-		sendActivationPing(this.app, {
-			extName: "htmlto-link-obsidian",
-			extVersion: this.manifest.version,
-			apiBaseUrl: this.settings.apiBaseUrl,
-		});
 
 		// 左侧功能区图标
 		this.addRibbonIcon("share", t("commandPublish"), () => {

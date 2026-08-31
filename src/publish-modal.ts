@@ -87,6 +87,11 @@ export class PublishFlowModal extends Modal {
 			});
 		}
 
+		contentEl.createEl("p", {
+			text: t("publishDataWarning"),
+			cls: "htmlto-link-publish-guest-note",
+		});
+
 		const optionsDisabled = this.phase === "publishing";
 		const multiTheme = hasMultiThemes(this.draft.templateId);
 		const themes = getTemplateThemes(this.draft.templateId);

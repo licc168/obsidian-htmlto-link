@@ -63,12 +63,13 @@ To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
 
 ## Privacy & Data
 
-- **Network access:** When you publish, the plugin sends the note's Markdown and referenced local images to the configured API server to create or update the share page. Deleting a share also contacts that server.
-- **Activation ping:** When the plugin loads, it sends the plugin version, platform, timestamp, and a random vault-specific anonymous ID to the configured API server. It never includes note content, note paths, vault names, usernames, or hostnames.
+- **Network access:** When you publish, the plugin sends the current note's Markdown and referenced local images to the configured API server to create or update the share page. Deleting a share also contacts that server. Requests are made only for these user-initiated operations; the plugin does not scan or upload the rest of the vault.
+- **Server-side storage:** The configured service stores the published note content and uploaded images to serve the resulting public page. Anyone with the public share URL may be able to view the published content. The current service does not provide end-to-end encryption for this plugin's shares.
+- **Retention:** Guest shares expire after 24 hours. Account-bound shares follow the retention period returned by the service and the applicable plan. Use **Delete share for current note** to request deletion of a share.
+- **Telemetry:** The plugin does not send startup pings or client-side usage analytics. The service may record the minimum request information needed to operate the publishing API; see the [HTML To Link Privacy Policy](https://htmlto.link/privacy-policy).
 - **Clipboard access:** After a successful publish, the plugin writes only the resulting public URL to the clipboard when “Copy link on success” is enabled.
 - **Vault access:** The plugin reads only the note being shared and its referenced local images. It writes `share_link` and `share_updated` to that note only when the corresponding setting is enabled.
-- **Local data:** Settings, share-update tokens, and image cache records are stored through Obsidian's plugin data API. The anonymous activation ID is stored through Obsidian's vault-scoped local storage API.
-- Guest shares expire after 24 hours.
+- **Local data:** Settings, share-update tokens, and image cache records are stored through Obsidian's plugin data API.
 
 ## Development
 

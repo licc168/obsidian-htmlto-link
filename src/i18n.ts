@@ -99,6 +99,8 @@ const dict = {
       "Guest share: link kept for only 24 hours. Add an API Token for a longer lifetime.",
     guestWarning:
       "No API Token set — this is a guest share: the share link is kept for only 24 hours. Add a Token in plugin settings for a longer lifetime.",
+    publishDataWarning:
+      "Publishing uploads this note and its referenced local images to the configured server. The resulting page is public and not end-to-end encrypted; do not include sensitive information.",
     // delete share
     deleteConfirmTitle: "Delete share",
     deleteConfirmMsg: "Are you sure you want to delete the share for \"{note}\"? The public link will no longer be accessible.",
@@ -250,6 +252,8 @@ const dict = {
     guestNoteGuestSimple: "游客分享：链接仅保留 24 小时。填写 API Token 可延长有效期。",
     guestWarning:
       "未填写 API Token，本次为游客分享：分享链接仅保留 24 小时。可在插件设置中填写 Token 延长有效期。",
+    publishDataWarning:
+      "发布会将当前笔记及其中引用的本地图片上传到所配置的服务器。生成的页面是公开的，当前不使用端到端加密，请勿包含敏感信息。",
     // delete share
     deleteConfirmTitle: "删除分享",
     deleteConfirmMsg: "确定要删除「{note}」的分享吗？删除后公开链接将无法访问。",
