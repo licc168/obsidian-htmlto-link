@@ -250,13 +250,24 @@ export class TemplatePreviewController {
 		for (const link of Array.from(
 			nav.querySelectorAll<HTMLAnchorElement>("[data-htmlto-link-toc-link]"),
 		)) {
-			link.addEventListener("click", () => {
+			link.addEventListener("click", (event) => {
+				event.preventDefault();
 				for (const item of Array.from(nav.children)) {
 					if (item.getAttribute("aria-current") === "true") {
 						item.removeAttribute("aria-current");
 					}
 				}
 				link.setAttribute("aria-current", "true");
+
+				const targetId = link.getAttribute("href")?.slice(1);
+				const target = targetId ? previewDocument.getElementById(targetId) : null;
+				if (target) {
+					target.scrollIntoView({
+						behavior: "auto",
+						block: "start",
+						inline: "nearest",
+					});
+				}
 			});
 		}
 	}

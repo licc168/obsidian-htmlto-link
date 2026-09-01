@@ -77,6 +77,7 @@ body {
   overflow-x: auto;
   overflow-y: auto;
 }
+html { scroll-behavior: auto !important; }
 .share-layout,
 .share-export-target,
 .share-stage,
