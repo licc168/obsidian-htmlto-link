@@ -49,6 +49,7 @@ export class TemplatePreviewController {
 		});
 		this.iframe.addEventListener("load", () => {
 			this.bindPreviewCopyButtons();
+			this.bindPreviewToc();
 		});
 		this.setPreviewVisible(false);
 	}
@@ -222,6 +223,42 @@ export class TemplatePreviewController {
 				element.removeAttribute("title");
 			}
 		}, 1600);
+	}
+
+	private bindPreviewToc(): void {
+		const previewDocument = this.iframe.contentDocument;
+		if (!previewDocument) return;
+
+		const toc = previewDocument.querySelector<HTMLElement>("[data-htmlto-link-toc]");
+		const toggle = previewDocument.querySelector<HTMLButtonElement>(
+			"[data-htmlto-link-toc-toggle]",
+		);
+		const nav = previewDocument.querySelector<HTMLElement>("[data-htmlto-link-toc-nav]");
+		if (!toc || !toggle || !nav) return;
+
+		toggle.addEventListener("click", () => {
+			const collapsed = toc.classList.toggle("is-collapsed");
+			toc.closest<HTMLElement>(".share-page-grid")?.classList.toggle(
+				"share-toc-collapsed",
+				collapsed,
+			);
+			toggle.setAttribute("aria-expanded", String(!collapsed));
+			toggle.setText(collapsed ? t("previewTocExpand") : t("previewTocCollapse"));
+			nav.hidden = collapsed;
+		});
+
+		for (const link of Array.from(
+			nav.querySelectorAll<HTMLAnchorElement>("[data-htmlto-link-toc-link]"),
+		)) {
+			link.addEventListener("click", () => {
+				for (const item of Array.from(nav.children)) {
+					if (item.getAttribute("aria-current") === "true") {
+						item.removeAttribute("aria-current");
+					}
+				}
+				link.setAttribute("aria-current", "true");
+			});
+		}
 	}
 
 	private setPreviewVisible(visible: boolean): void {
