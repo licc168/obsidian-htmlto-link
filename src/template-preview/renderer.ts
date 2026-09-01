@@ -4,6 +4,8 @@ import {
 	getPreviewTemplateMeta,
 	getPreviewThemeClass,
 } from "./registry";
+import { renderMermaidInHtml } from "./mermaid";
+import { highlightCodeBlocks } from "./code-highlight";
 import { t } from "../i18n";
 
 const FRAME_STYLES = `
@@ -29,6 +31,9 @@ body.share-page {
 }
 .share-card-shell .card.card-plain { border-radius: 0; box-shadow: none; }
 .card-content-inner img { max-width: 100%; height: auto; }
+.share-card-shell .card-content-inner .mermaid { width: 100%; max-width: 100%; margin: 1.2em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.share-card-shell .card-content-inner .mermaid svg { display: inline-block; max-width: none; height: auto; vertical-align: middle; }
+.share-card-shell .card-content-inner .mermaid-error { padding: 12px 14px; border: 1px solid rgba(220, 38, 38, 0.28); border-radius: 8px; background: rgba(254, 226, 226, 0.72); color: #b91c1c; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .markdown-table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
 .markdown-table-wrapper > table { min-width: 100%; }
 .preview-empty { padding: 48px 24px; color: #64748b; text-align: center; }
@@ -261,8 +266,12 @@ export async function renderLocalTemplatePreview(
 			input.file.path,
 			component,
 		);
-		const content = addHeadingAnchorsAndBuildToc(
+		const renderedHtml = await renderMermaidInHtml(
 			sanitizeRenderedHtml(staging.innerHTML),
+		);
+		const highlightedHtml = highlightCodeBlocks(renderedHtml);
+		const content = addHeadingAnchorsAndBuildToc(
+			sanitizeRenderedHtml(highlightedHtml),
 		);
 		const meta = getPreviewTemplateMeta(input.templateId);
 		const themeClass = getPreviewThemeClass(input.templateId, input.themeClass);

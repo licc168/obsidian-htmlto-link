@@ -187,14 +187,29 @@ export class TemplatePreviewController {
 			element.getAttribute("data-copy-text") ??
 			element.getAttribute("data-clipboard-text");
 		const codeText = element.closest("pre")?.querySelector("code")?.textContent;
-		const text = (explicitText ?? codeText ?? "").trimEnd();
+		const textSource: string =
+			typeof explicitText === "string"
+				? explicitText
+				: typeof codeText === "string"
+					? codeText
+					: "";
+		const text = textSource.trimEnd();
 		if (!text) {
 			new Notice(t("previewCopyFailed"));
 			return;
 		}
 
+		const navigatorWithClipboard = navigator as Navigator & {
+			clipboard?: Clipboard;
+		};
+		const clipboard = navigatorWithClipboard.clipboard;
+		if (!clipboard || typeof clipboard.writeText !== "function") {
+			new Notice(t("previewCopyFailed"));
+			return;
+		}
+
 		try {
-			await navigator.clipboard.writeText(text);
+			await clipboard.writeText(text);
 			this.showCopyFeedback(element);
 		} catch {
 			new Notice(t("previewCopyFailed"));

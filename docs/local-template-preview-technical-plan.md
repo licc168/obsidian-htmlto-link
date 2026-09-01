@@ -27,7 +27,7 @@
 - 第一阶段不把整个 Next.js/React 应用嵌入插件。
 - 第一阶段不提供在线协作、版本历史、密码保护和分享链接管理。
 - 第一阶段不修改 `html2url` 后端接口或数据库。
-- 第一阶段不保证 Mermaid、KaTeX、自定义 CSS、Dataview 动态查询等扩展能力完全一致；这些能力按兼容性分阶段补齐。
+- 第一阶段不保证 KaTeX、自定义 CSS、Dataview 动态查询等扩展能力完全一致；Mermaid 已在本地预览中通过插件内置渲染补齐。
 
 ## 3. 方案选择
 
@@ -173,7 +173,7 @@ tests/
 - 普通 wiki 链接转为显示文本。
 - 禁止执行原始 Markdown 中的脚本。
 
-建议使用与网站相同主版本的 `marked`。代码高亮第一阶段可以只输出安全的 `<pre><code>`；确认包体影响后再决定是否打包 `highlight.js`。
+建议使用与网站相同主版本的 `marked`。当前本地预览通过插件内置 `highlight.js` 生成与发布页一致的高亮结构；无语言标记的 SQL 代码也会进行保守识别。
 
 ### 7.2 本地图片
 
@@ -259,7 +259,6 @@ tests/
 
 ### 后续增强
 
-- Mermaid。
 - KaTeX 数学公式。
 - Obsidian callout 的发布页一致性。
 - 内嵌笔记和块引用。
@@ -335,7 +334,7 @@ tests/
 | 模板 CSS 依赖网站资源 | 离线样式缺失 | 同步时内联资源或替换为纯 CSS |
 | 大图片转 data URL 占用内存 | Obsidian 卡顿 | 缓存上限、按需转换、关闭时释放 |
 | 原始 HTML 带危险内容 | 影响桌面应用安全 | sanitizer + CSP + 无脚本 sandbox |
-| Markdown 扩展渲染差异 | 用户认为预览不准确 | 明确兼容范围，逐步补 Mermaid/KaTeX/callout |
+| Markdown 扩展渲染差异 | 用户认为预览不准确 | 明确兼容范围，逐步补 KaTeX/callout |
 
 ## 17. 建议结论
 

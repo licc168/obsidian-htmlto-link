@@ -92,7 +92,7 @@
 }
 
 .htmlto-link-template-preview-staging {
-	display: none !important;
+	display: none;
 }
 
 .htmlto-link-template-preview-host.htmlto-link-template-preview-content-hidden
@@ -178,7 +178,7 @@
 }
 
 .htmlto-link-template-preview-hidden {
-	display: none !important;
+	display: none;
 }
 
 .htmlto-link-template-preview-overlay {
