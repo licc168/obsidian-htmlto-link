@@ -36,6 +36,64 @@ body.share-page {
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
 `;
 
+// Template styles were authored for the published page and some of them use
+// overflow:hidden. Keep the published output unchanged, but make the local
+// preview viewport responsive and scrollable when a document is intrinsically
+// wider than the available Obsidian pane.
+const PREVIEW_LAYOUT_OVERRIDES = `
+html,
+body {
+  width: 100%;
+  max-width: none;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.share-layout,
+.share-export-target,
+.share-stage,
+.share-card-shell,
+.share-card-shell .card,
+.share-card-shell .card-content,
+.share-card-shell .card-content-inner {
+  min-width: 0;
+}
+.share-layout,
+.share-export-target,
+.share-stage,
+.share-card-shell {
+  max-width: none;
+}
+.share-card-shell .card {
+  overflow: visible;
+}
+.share-card-shell .card-content,
+.share-card-shell .card-content-inner {
+  overflow: visible;
+}
+.share-card-shell .card-content-inner {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.share-card-shell .card-content-inner img,
+.share-card-shell .card-content-inner video,
+.share-card-shell .card-content-inner svg,
+.share-card-shell .card-content-inner canvas {
+  max-width: 100%;
+  height: auto;
+}
+.share-card-shell .card-content-inner pre,
+.share-card-shell .card-content-inner .markdown-table-wrapper,
+.share-card-shell .card-content-inner .table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+.share-card-shell .card-content-inner pre code {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+`;
+
 const BLOCKED_TAGS = new Set([
 	"SCRIPT",
 	"IFRAME",
@@ -108,7 +166,7 @@ export async function renderLocalTemplatePreview(
 		const classes = ["card", meta.cardClass, themeClass, ...(meta.extraClasses ?? [])]
 			.filter(Boolean)
 			.join(" ");
-		const css = `${FRAME_STYLES}\n${COMMON_TEMPLATE_STYLES}\n${TEMPLATE_STYLES[input.templateId] ?? TEMPLATE_STYLES.plain}`;
+		const css = `${FRAME_STYLES}\n${COMMON_TEMPLATE_STYLES}\n${TEMPLATE_STYLES[input.templateId] ?? TEMPLATE_STYLES.plain}\n${PREVIEW_LAYOUT_OVERRIDES}`;
 
 		return `<!doctype html>
 <html lang="zh-CN">

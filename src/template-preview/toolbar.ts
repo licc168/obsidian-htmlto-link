@@ -29,6 +29,7 @@ export class TemplatePreviewToolbar {
 		);
 		this.templateSelect = templateField.createEl("select", {
 			cls: "htmlto-link-template-preview-select",
+			attr: { "aria-label": t("previewTemplateAriaLabel") },
 		});
 		this.templateSelect.addEventListener("change", () => {
 			this.handlers.onTemplateChange(this.templateSelect.value);
@@ -40,6 +41,7 @@ export class TemplatePreviewToolbar {
 		);
 		this.themeSelect = this.themeField.createEl("select", {
 			cls: "htmlto-link-template-preview-select",
+			attr: { "aria-label": t("previewThemeAriaLabel") },
 		});
 		this.themeSelect.addEventListener("change", () => {
 			this.handlers.onThemeChange(this.themeSelect.value);

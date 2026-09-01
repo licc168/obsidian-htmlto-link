@@ -115,6 +115,7 @@
 	position: absolute;
 	top: 8px;
 	right: 12px;
+	z-index: 3;
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
@@ -144,6 +145,7 @@
 }
 
 .htmlto-link-template-preview-select {
+	appearance: auto;
 	min-width: 112px;
 	min-height: 30px;
 	padding: 3px 22px 3px 7px;
@@ -152,6 +154,8 @@
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 5px;
 	font-size: var(--font-ui-small);
+	cursor: pointer;
+	pointer-events: auto;
 }
 
 .htmlto-link-template-preview-select:focus-visible {
@@ -173,9 +177,12 @@
 .htmlto-link-template-preview-overlay {
 	position: absolute;
 	inset: 0;
+	z-index: 1;
 	display: none;
 	padding: 48px 12px 12px;
-	overflow: hidden;
+	min-width: 0;
+	min-height: 0;
+	overflow: auto;
 	pointer-events: auto;
 }
 
@@ -187,9 +194,11 @@
 	display: block;
 	width: 100%;
 	height: 100%;
+	min-width: 0;
 	min-height: 260px;
 	border: 0;
 	background: #f1f5f9;
+	overflow: auto;
 }
 
 @media (max-width: 620px) {
