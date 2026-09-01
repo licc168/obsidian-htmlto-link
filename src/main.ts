@@ -9,9 +9,11 @@ import {
 } from "./publish";
 import { initI18n, t } from "./i18n";
 import { handleVaultDelete, handleVaultRename } from "./share-index";
+import { TemplatePreviewManager } from "./template-preview/manager";
 
 export default class HtmltoLinkPlugin extends Plugin {
 	settings!: HtmltoLinkSettings;
+	private templatePreviewManager?: TemplatePreviewManager;
 
 	async onload() {
 		await this.loadSettings();
@@ -63,6 +65,42 @@ export default class HtmltoLinkPlugin extends Plugin {
 
 		this.addSettingTab(new HtmltoLinkSettingTab(this.app, this));
 
+		this.templatePreviewManager = new TemplatePreviewManager(this);
+		this.app.workspace.onLayoutReady(() => {
+			this.templatePreviewManager?.sync();
+		});
+		this.registerEvent(
+			this.app.workspace.on("layout-change", () => {
+				this.templatePreviewManager?.sync();
+			}),
+		);
+		this.registerEvent(
+			this.app.workspace.on("editor-change", (_editor, info) => {
+				if (info instanceof MarkdownView) {
+					this.templatePreviewManager?.onEditorChange(info);
+				}
+			}),
+		);
+		this.registerEvent(
+			this.app.vault.on("modify", (file) => {
+				if (file instanceof TFile) this.templatePreviewManager?.onFileChange(file);
+			}),
+		);
+
+		this.addCommand({
+			id: "focus-template-preview-controls",
+			name: t("commandFocusTemplatePreview"),
+			checkCallback: (checking: boolean) => {
+				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (!view) return false;
+				if (!checking) {
+					this.templatePreviewManager?.sync();
+					this.templatePreviewManager?.focusActive();
+				}
+				return true;
+			},
+		});
+
 		this.registerEvent(
 			this.app.vault.on("rename", (file, oldPath) => {
 				void handleVaultRename(this, file, oldPath);
@@ -106,7 +144,8 @@ export default class HtmltoLinkPlugin extends Plugin {
 	}
 
 	onunload() {
-		// plugin unloaded
+		this.templatePreviewManager?.destroy();
+		this.templatePreviewManager = undefined;
 	}
 
 	async loadSettings() {
