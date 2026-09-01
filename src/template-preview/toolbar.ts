@@ -8,6 +8,7 @@ import { t } from "../i18n";
 export interface TemplatePreviewToolbarHandlers {
 	onTemplateChange: (templateId: string) => void;
 	onThemeChange: (themeClass: string) => void;
+	onPublish: () => void;
 }
 
 /** Compact, native-select based controls mounted in a Markdown view. */
@@ -16,7 +17,7 @@ export class TemplatePreviewToolbar {
 	private readonly templateSelect: HTMLSelectElement;
 	private readonly themeField: HTMLElement;
 	private readonly themeSelect: HTMLSelectElement;
-	private readonly statusEl: HTMLElement;
+	private readonly publishButton: HTMLButtonElement;
 	private handlers: TemplatePreviewToolbarHandlers;
 
 	constructor(parent: HTMLElement, handlers: TemplatePreviewToolbarHandlers) {
@@ -47,9 +48,16 @@ export class TemplatePreviewToolbar {
 			this.handlers.onThemeChange(this.themeSelect.value);
 		});
 
-		this.statusEl = this.root.createSpan({
-			text: t("previewLocalStatus"),
-			cls: "htmlto-link-template-preview-status",
+		this.publishButton = this.root.createEl("button", {
+			text: t("previewPublishButton"),
+			cls: "htmlto-link-template-preview-publish mod-cta",
+			attr: {
+				type: "button",
+				"aria-label": t("previewPublishAriaLabel"),
+			},
+		});
+		this.publishButton.addEventListener("click", () => {
+			this.handlers.onPublish();
 		});
 		this.refreshTemplateOptions("");
 		this.refreshThemeOptions("", "");
@@ -67,8 +75,9 @@ export class TemplatePreviewToolbar {
 	setBusy(isBusy: boolean): void {
 		this.templateSelect.disabled = isBusy;
 		this.themeSelect.disabled = isBusy;
-		this.statusEl.setText(
-			isBusy ? t("previewRendering") : t("previewLocalStatus"),
+		this.publishButton.disabled = isBusy;
+		this.publishButton.setText(
+			isBusy ? t("previewPublishingButton") : t("previewPublishButton"),
 		);
 	}
 

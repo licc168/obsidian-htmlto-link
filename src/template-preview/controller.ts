@@ -1,6 +1,6 @@
 import { MarkdownView, TFile } from "obsidian";
 import type HtmltoLinkPlugin from "../main";
-import { prepareMarkdown, readNoteMarkdown } from "../publish";
+import { prepareMarkdown, publishNote, readNoteMarkdown } from "../publish";
 import { resolveThemeClassForTemplate } from "../constants";
 import { t } from "../i18n";
 import { renderLocalTemplatePreview } from "./renderer";
@@ -33,6 +33,9 @@ export class TemplatePreviewController {
 		this.toolbar = new TemplatePreviewToolbar(this.root, {
 			onTemplateChange: (templateId) => this.selectTemplate(templateId),
 			onThemeChange: (themeClass) => this.selectTheme(themeClass),
+			onPublish: () => {
+				if (this.view.file) void publishNote(this.plugin, this.view.file);
+			},
 		});
 		this.overlay = this.root.createDiv({ cls: "htmlto-link-template-preview-overlay" });
 		this.iframe = this.overlay.createEl("iframe", {

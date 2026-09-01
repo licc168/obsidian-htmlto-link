@@ -170,6 +170,13 @@
 	white-space: nowrap;
 }
 
+.htmlto-link-template-preview-publish {
+	min-height: 30px;
+	padding: 3px 12px;
+	font-size: var(--font-ui-small);
+	white-space: nowrap;
+}
+
 .htmlto-link-template-preview-hidden {
 	display: none !important;
 }
