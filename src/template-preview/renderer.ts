@@ -92,6 +92,10 @@ body {
   overflow-wrap: normal;
   word-break: normal;
 }
+.htmlto-link-preview-copy-success {
+  outline: 2px solid #22c55e !important;
+  outline-offset: 2px;
+}
 `;
 
 const BLOCKED_TAGS = new Set([

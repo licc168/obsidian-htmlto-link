@@ -1,4 +1,4 @@
-import { MarkdownView, TFile } from "obsidian";
+import { MarkdownView, Notice, TFile } from "obsidian";
 import type HtmltoLinkPlugin from "../main";
 import { prepareMarkdown, publishNote, readNoteMarkdown } from "../publish";
 import { resolveThemeClassForTemplate } from "../constants";
@@ -46,6 +46,9 @@ export class TemplatePreviewController {
 				referrerpolicy: "no-referrer",
 				sandbox: "allow-same-origin",
 			},
+		});
+		this.iframe.addEventListener("load", () => {
+			this.bindPreviewCopyButtons();
 		});
 		this.setPreviewVisible(false);
 	}
@@ -139,6 +142,86 @@ export class TemplatePreviewController {
 	private buildErrorDocument(message: string): string {
 		const escaped = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		return `<!doctype html><html lang="zh-CN"><body style="font-family: sans-serif; padding: 24px; color: #b42318; background: #fff7f7;"><strong>${t("previewFailed")}</strong><p>${escaped}</p></body></html>`;
+	}
+
+	/**
+	 * Obsidian's MarkdownRenderer can add a code-copy button, but its event
+	 * listener is not preserved when the rendered HTML is moved into srcdoc.
+	 * Re-bind only explicit copy controls in the sandboxed local preview.
+	 */
+	private bindPreviewCopyButtons(): void {
+		const previewDocument = this.iframe.contentDocument;
+		if (!previewDocument) return;
+
+		for (const element of Array.from(
+			previewDocument.querySelectorAll<HTMLElement>("button, [role='button']"),
+		)) {
+			if (!this.isCopyButton(element) || element.dataset.htmltoLinkCopyBound) continue;
+			element.dataset.htmltoLinkCopyBound = "true";
+			element.addEventListener("click", (event) => {
+				event.preventDefault();
+				event.stopPropagation();
+				void this.copyPreviewButtonText(element);
+			});
+		}
+	}
+
+	private isCopyButton(element: HTMLElement): boolean {
+		const marker = [
+			element.className,
+			element.getAttribute("aria-label") ?? "",
+			element.getAttribute("title") ?? "",
+		].join(" ").toLowerCase();
+		return (
+			marker.includes("copy") ||
+			element.hasAttribute("data-copy") ||
+			element.hasAttribute("data-copy-text") ||
+			element.hasAttribute("data-clipboard-text")
+		);
+	}
+
+	private async copyPreviewButtonText(element: HTMLElement): Promise<void> {
+		const explicitText =
+			element.getAttribute("data-copy") ??
+			element.getAttribute("data-copy-text") ??
+			element.getAttribute("data-clipboard-text");
+		const codeText = element.closest("pre")?.querySelector("code")?.textContent;
+		const text = (explicitText ?? codeText ?? "").trimEnd();
+		if (!text) {
+			new Notice(t("previewCopyFailed"));
+			return;
+		}
+
+		try {
+			await navigator.clipboard.writeText(text);
+			this.showCopyFeedback(element);
+		} catch {
+			new Notice(t("previewCopyFailed"));
+		}
+	}
+
+	private showCopyFeedback(element: HTMLElement): void {
+		const originalLabel = element.dataset.htmltoLinkCopyLabel ??
+			element.getAttribute("aria-label") ??
+			element.getAttribute("title") ??
+			"";
+		element.dataset.htmltoLinkCopyLabel = originalLabel;
+		element.classList.add("htmlto-link-preview-copy-success");
+		element.setAttribute("aria-label", t("previewCopied"));
+		element.setAttribute("title", t("previewCopied"));
+		new Notice(t("previewCopied"));
+
+		window.setTimeout(() => {
+			if (!element.isConnected) return;
+			element.classList.remove("htmlto-link-preview-copy-success");
+			if (originalLabel) {
+				element.setAttribute("aria-label", originalLabel);
+				element.setAttribute("title", originalLabel);
+			} else {
+				element.removeAttribute("aria-label");
+				element.removeAttribute("title");
+			}
+		}, 1600);
 	}
 
 	private setPreviewVisible(visible: boolean): void {
