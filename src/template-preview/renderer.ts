@@ -184,6 +184,29 @@ function sanitizeRenderedHtml(html: string): string {
 	return parsed.body.innerHTML;
 }
 
+function addOrderedListIndices(html: string): string {
+	const parsed = new DOMParser().parseFromString(
+		`<div data-ordered-list-root="true">${html}</div>`,
+		"text/html",
+	);
+	const root = parsed.body.firstElementChild as HTMLElement | null;
+	if (!root) return html;
+
+	for (const orderedList of Array.from(root.querySelectorAll("ol"))) {
+		const startAttribute = Number.parseInt(orderedList.getAttribute("start") ?? "1", 10);
+		const startIndex = Number.isFinite(startAttribute) ? startAttribute : 1;
+		let itemIndex = startIndex;
+
+		for (const child of Array.from(orderedList.children)) {
+			if (child.tagName !== "LI") continue;
+			child.setAttribute("data-index", String(itemIndex));
+			itemIndex += 1;
+		}
+	}
+
+	return root.innerHTML;
+}
+
 interface PreviewContentWithToc {
 	contentHtml: string;
 	tocHtml: string;
@@ -271,7 +294,7 @@ export async function renderLocalTemplatePreview(
 		);
 		const highlightedHtml = highlightCodeBlocks(renderedHtml);
 		const content = addHeadingAnchorsAndBuildToc(
-			sanitizeRenderedHtml(highlightedHtml),
+			addOrderedListIndices(sanitizeRenderedHtml(highlightedHtml)),
 		);
 		const meta = getPreviewTemplateMeta(input.templateId);
 		const themeClass = getPreviewThemeClass(input.templateId, input.themeClass);
