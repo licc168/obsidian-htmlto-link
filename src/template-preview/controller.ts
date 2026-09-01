@@ -6,6 +6,14 @@ import { t } from "../i18n";
 import { renderLocalTemplatePreview } from "./renderer";
 import { TemplatePreviewToolbar } from "./toolbar";
 
+interface ClipboardWriter {
+	writeText(value: string): Promise<void>;
+}
+
+interface NavigatorWithClipboardWriter {
+	clipboard?: ClipboardWriter;
+}
+
 export class TemplatePreviewController {
 	private readonly host: HTMLElement;
 	private readonly originalContent: HTMLElement;
@@ -193,15 +201,13 @@ export class TemplatePreviewController {
 				: typeof codeText === "string"
 					? codeText
 					: "";
-		const text = textSource.trimEnd();
+		const text = textSource.replace(/\s+$/, "");
 		if (!text) {
 			new Notice(t("previewCopyFailed"));
 			return;
 		}
 
-		const navigatorWithClipboard = navigator as Navigator & {
-			clipboard?: Clipboard;
-		};
+		const navigatorWithClipboard = navigator as unknown as NavigatorWithClipboardWriter;
 		const clipboard = navigatorWithClipboard.clipboard;
 		if (!clipboard || typeof clipboard.writeText !== "function") {
 			new Notice(t("previewCopyFailed"));
