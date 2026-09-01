@@ -32,7 +32,7 @@ body.share-page {
 .markdown-table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
 .markdown-table-wrapper > table { min-width: 100%; }
 .preview-empty { padding: 48px 24px; color: #64748b; text-align: center; }
-.share-toc { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow: auto; padding: 12px; border: 1px solid rgba(100, 116, 139, 0.24); border-radius: 14px; background: rgba(255, 255, 255, 0.82); color: #334155; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
+.share-toc { position: fixed; top: 24px; right: max(16px, calc((100vw - 70rem) / 2)); z-index: 20; width: 220px; max-height: calc(100vh - 48px); overflow: auto; padding: 12px; border: 1px solid rgba(100, 116, 139, 0.24); border-radius: 14px; background: rgba(255, 255, 255, 0.92); color: #334155; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
 .share-toc-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .share-toc-title { font-size: 13px; font-weight: 700; }
 .share-toc-toggle { min-height: 30px; padding: 4px 8px; border: 1px solid rgba(100, 116, 139, 0.25); border-radius: 7px; background: rgba(248, 250, 252, 0.9); color: #475569; cursor: pointer; font-size: 11px; }
@@ -41,7 +41,7 @@ body.share-page {
 .share-toc-link { display: block; padding: 6px 7px; padding-left: calc(7px + (var(--toc-level) - 1) * 12px); border-radius: 7px; color: #64748b; font-size: 12px; line-height: 1.45; text-decoration: none; overflow-wrap: anywhere; }
 .share-toc-link:hover, .share-toc-link[aria-current="true"] { background: rgba(99, 102, 241, 0.1); color: #4338ca; }
 .share-page-grid.share-toc-collapsed { grid-template-columns: minmax(0, 1fr) 44px; }
-.share-toc.is-collapsed { padding: 8px; }
+.share-toc.is-collapsed { width: 44px; padding: 8px; }
 .share-toc.is-collapsed .share-toc-header { flex-direction: column; }
 .share-toc.is-collapsed .share-toc-title { writing-mode: vertical-rl; }
 .share-toc.is-collapsed .share-toc-toggle { padding: 4px 6px; }
@@ -58,7 +58,8 @@ body.share-page {
 }
 @media (max-width: 800px) {
   .share-page-grid, .share-page-grid.share-toc-collapsed { display: block; }
-  .share-toc { position: static; max-height: none; margin-bottom: 16px; }
+  .share-toc { position: static; width: auto; max-height: none; margin-bottom: 16px; }
+  .share-toc.is-collapsed { width: auto; }
   .share-toc.is-collapsed .share-toc-header { flex-direction: row; }
   .share-toc.is-collapsed .share-toc-title { writing-mode: horizontal-tb; }
 }
