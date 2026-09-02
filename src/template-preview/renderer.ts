@@ -33,6 +33,7 @@ body.share-page {
 .card-content-inner img { max-width: 100%; height: auto; }
 .share-card-shell .card-content-inner .mermaid { width: 100%; max-width: 100%; margin: 1.2em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
 .share-card-shell .card-content-inner .mermaid svg { display: inline-block; max-width: none; height: auto; vertical-align: middle; }
+.share-card-shell .card-content-inner .mermaid svg.htmlto-link-mermaid-intrinsic { max-width: none; }
 .share-card-shell .card-content-inner .mermaid-error { padding: 12px 14px; border: 1px solid rgba(220, 38, 38, 0.28); border-radius: 8px; background: rgba(254, 226, 226, 0.72); color: #b91c1c; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .markdown-table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
 .markdown-table-wrapper > table { min-width: 100%; }
@@ -130,6 +131,35 @@ html { scroll-behavior: auto !important; }
   overflow-x: auto;
   overscroll-behavior-inline: contain;
 }
+/* Obsidian emits .table-wrapper; the web renderer emits
+   .markdown-table-wrapper. Both must keep readable columns and scroll locally. */
+.share-card-shell .card-content-inner .markdown-table-wrapper,
+.share-card-shell .card-content-inner .table-wrapper {
+  width: 100%;
+  margin: 1em 0;
+  padding-bottom: 4px;
+}
+.share-card-shell .card-content-inner .markdown-table-wrapper > table,
+.share-card-shell .card-content-inner .table-wrapper > table {
+  min-width: 100%;
+  max-width: none;
+  margin: 0;
+  table-layout: auto;
+}
+.share-card-shell .card-content-inner .markdown-table-wrapper :is(th, td),
+.share-card-shell .card-content-inner .table-wrapper :is(th, td) {
+  min-width: 7.5rem;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
+  vertical-align: top;
+}
+.share-card-shell .card-content-inner .markdown-table-wrapper :is(th, td) code,
+.share-card-shell .card-content-inner .table-wrapper :is(th, td) code {
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
 .share-card-shell .card-content-inner pre code {
   overflow-wrap: normal;
   word-break: normal;
@@ -182,6 +212,36 @@ function sanitizeRenderedHtml(html: string): string {
 		}
 	}
 	return parsed.body.innerHTML;
+}
+
+/**
+ * Obsidian's MarkdownRenderer does not guarantee a table scroll wrapper.
+ * Normalize every rendered table so preview sizing never depends on the
+ * current Obsidian DOM shape.
+ */
+function normalizeTableWrappers(html: string): string {
+	const parsed = new DOMParser().parseFromString(
+		`<div data-table-root="true">${html}</div>`,
+		"text/html",
+	);
+	const root = parsed.body.firstElementChild as HTMLElement | null;
+	if (!root) return html;
+
+	for (const table of Array.from(root.querySelectorAll<HTMLTableElement>("table"))) {
+		const existingWrapper = table.parentElement?.closest<HTMLElement>(
+			".markdown-table-wrapper, .table-wrapper",
+		);
+		if (existingWrapper && root.contains(existingWrapper)) {
+			existingWrapper.classList.add("markdown-table-wrapper");
+			continue;
+		}
+
+		const wrapper = root.createDiv({ cls: "markdown-table-wrapper" });
+		table.replaceWith(wrapper);
+		wrapper.appendChild(table);
+	}
+
+	return root.innerHTML;
 }
 
 function addOrderedListIndices(html: string): string {
@@ -293,8 +353,11 @@ export async function renderLocalTemplatePreview(
 			sanitizeRenderedHtml(staging.innerHTML),
 		);
 		const highlightedHtml = highlightCodeBlocks(renderedHtml);
+		const normalizedHtml = normalizeTableWrappers(
+			sanitizeRenderedHtml(highlightedHtml),
+		);
 		const content = addHeadingAnchorsAndBuildToc(
-			addOrderedListIndices(sanitizeRenderedHtml(highlightedHtml)),
+			addOrderedListIndices(normalizedHtml),
 		);
 		const meta = getPreviewTemplateMeta(input.templateId);
 		const themeClass = getPreviewThemeClass(input.templateId, input.themeClass);

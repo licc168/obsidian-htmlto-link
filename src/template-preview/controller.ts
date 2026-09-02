@@ -23,6 +23,7 @@ export class TemplatePreviewController {
 	private readonly toolbar: TemplatePreviewToolbar;
 	private templateId = "";
 	private themeClass = "";
+	private currentFilePath: string | null;
 	private renderToken = 0;
 	private debounceTimer: number | null = null;
 	private disposed = false;
@@ -35,6 +36,7 @@ export class TemplatePreviewController {
 		if (!viewContent) throw new Error("Markdown view content is unavailable");
 		this.host = viewContent;
 		this.originalContent = viewContent;
+		this.currentFilePath = view.file?.path ?? null;
 		this.host.addClass("htmlto-link-template-preview-host");
 
 		this.root = this.host.createDiv({ cls: "htmlto-link-template-preview-root" });
@@ -74,6 +76,21 @@ export class TemplatePreviewController {
 	handleEditorChange(info: MarkdownView): void {
 		if (this.disposed || info !== this.view || !this.templateId) return;
 		this.scheduleRender();
+	}
+
+	handleViewFileChange(): void {
+		if (this.disposed) return;
+		const nextFilePath = this.view.file?.path ?? null;
+		if (nextFilePath === this.currentFilePath) return;
+
+		this.currentFilePath = nextFilePath;
+		this.renderToken += 1;
+		if (this.debounceTimer !== null) {
+			window.clearTimeout(this.debounceTimer);
+			this.debounceTimer = null;
+		}
+		this.iframe.srcdoc = "";
+		if (this.templateId && nextFilePath) void this.renderNow();
 	}
 
 	handleFileChange(file: TFile): void {
@@ -125,6 +142,7 @@ export class TemplatePreviewController {
 	private async renderNow(): Promise<void> {
 		if (this.disposed || !this.templateId || !this.view.file) return;
 		const file = this.view.file;
+		this.currentFilePath = file.path;
 		const token = ++this.renderToken;
 		this.toolbar.setBusy(true);
 		try {
@@ -137,10 +155,18 @@ export class TemplatePreviewController {
 				templateId: this.templateId,
 				themeClass: this.themeClass,
 			});
-			if (this.disposed || token !== this.renderToken) return;
+			if (
+				this.disposed ||
+				token !== this.renderToken ||
+				this.view.file?.path !== file.path
+			) return;
 			this.iframe.srcdoc = srcdoc;
 		} catch (error) {
-			if (this.disposed || token !== this.renderToken) return;
+			if (
+				this.disposed ||
+				token !== this.renderToken ||
+				this.view.file?.path !== file.path
+			) return;
 			const message = error instanceof Error ? error.message : String(error);
 			this.iframe.srcdoc = this.buildErrorDocument(message);
 		} finally {

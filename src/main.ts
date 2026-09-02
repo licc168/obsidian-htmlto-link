@@ -75,6 +75,12 @@ export default class HtmltoLinkPlugin extends Plugin {
 			}),
 		);
 		this.registerEvent(
+			this.app.workspace.on("file-open", () => {
+				this.templatePreviewManager?.sync();
+				window.setTimeout(() => this.templatePreviewManager?.sync(), 0);
+			}),
+		);
+		this.registerEvent(
 			this.app.workspace.on("editor-change", (_editor, info) => {
 				if (info instanceof MarkdownView) {
 					this.templatePreviewManager?.onEditorChange(info);

@@ -13,7 +13,10 @@ export class TemplatePreviewManager {
 			if (!(leaf.view instanceof MarkdownView) || !canMountTemplatePreview(leaf.view)) continue;
 			const view = leaf.view;
 			liveViews.add(view);
-			if (!this.controllers.has(view)) {
+			const controller = this.controllers.get(view);
+			if (controller) {
+				controller.handleViewFileChange();
+			} else {
 				this.controllers.set(view, new TemplatePreviewController(this.plugin, view));
 			}
 		}
