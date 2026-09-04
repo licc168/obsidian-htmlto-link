@@ -14,6 +14,9 @@ export interface NoteShareRecord {
 	updateToken: string;
 	url: string;
 	updatedAt: string;
+	/** 最近一次服务端返回的归属状态；旧配置缺失时保持兼容 */
+	temporary?: boolean;
+	expiresAt?: string;
 }
 
 /** 插件界面语言：auto 跟随 Obsidian，en/zh 手动指定 */

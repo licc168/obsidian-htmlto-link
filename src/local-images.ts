@@ -81,8 +81,15 @@ function isImageFile(file: TFile): boolean {
 	return Boolean(EXT_CONTENT_TYPE[(file.extension || extOf(file.path)).toLowerCase()]);
 }
 
-function getCachedUrl(record: UploadedAssetRecord | undefined, file: TFile): string | null {
+function getCachedUrl(
+	record: UploadedAssetRecord | undefined,
+	file: TFile,
+	hasApiToken: boolean,
+): string | null {
 	if (!record || record.mtime !== file.stat.mtime || record.size !== file.stat.size) return null;
+	// 匿名上传的资源也有独立有效期。用户后来设置 Token 时必须重新上传为
+	// 账号资源，否则页面虽然已认领，图片仍会在游客资源到期后失效。
+	if (record.temporary && hasApiToken) return null;
 	if (record.temporary) {
 		if (!record.expiresAt || Date.parse(record.expiresAt) <= Date.now()) return null;
 	}
@@ -154,12 +161,17 @@ export async function rewriteLocalImagesForShare(
 
 	const urlByPath = new Map<string, string>();
 	const uniqueTargets = [...new Set(refs.map((ref) => ref.target))];
+	const hasApiToken = Boolean(settings.apiToken.trim());
 	let done = 0;
 	const results = await Promise.all(
 		uniqueTargets.map(async (target) => {
 			const file = resolveLocalImage(app, sourceFile.path, target);
 			if (!file || !isImageFile(file)) return { target, skipped: true } as const;
-			const cachedUrl = getCachedUrl(settings.uploadedAssets[file.path], file);
+			const cachedUrl = getCachedUrl(
+				settings.uploadedAssets[file.path],
+				file,
+				hasApiToken,
+			);
 			if (cachedUrl) return { target, file, url: cachedUrl, cached: true } as const;
 			try {
 				const binary = await app.vault.readBinary(file);

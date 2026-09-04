@@ -171,6 +171,8 @@ async function doPublish(
 			updateToken,
 			url,
 			updatedAt: new Date().toISOString(),
+			temporary: result.temporary,
+			expiresAt: result.expiresAt,
 		});
 	}
 
