@@ -1,6 +1,6 @@
 import { MarkdownView, Notice, TFile } from "obsidian";
 import type HtmltoLinkPlugin from "../main";
-import { prepareMarkdown, publishNote, readNoteMarkdown } from "../publish";
+import { prepareMarkdown, publishNote } from "../publish";
 import { resolveThemeClassForTemplate } from "../constants";
 import { t } from "../i18n";
 import { renderLocalTemplatePreview } from "./renderer";
@@ -27,6 +27,7 @@ export class TemplatePreviewController {
 	private renderToken = 0;
 	private debounceTimer: number | null = null;
 	private disposed = false;
+	private editorSnapshot: { path: string; markdown: string } | null = null;
 
 	constructor(
 		private readonly plugin: HtmltoLinkPlugin,
@@ -75,6 +76,12 @@ export class TemplatePreviewController {
 
 	handleEditorChange(info: MarkdownView): void {
 		if (this.disposed || info !== this.view || !this.templateId) return;
+		// A file-open event can precede the editor's document replacement.
+		// Only accept editor content delivered by an actual editor change.
+		this.handleViewFileChange();
+		if (info.file) {
+			this.editorSnapshot = { path: info.file.path, markdown: info.editor.getValue() };
+		}
 		this.scheduleRender();
 	}
 
@@ -84,12 +91,14 @@ export class TemplatePreviewController {
 		if (nextFilePath === this.currentFilePath) return;
 
 		this.currentFilePath = nextFilePath;
+		this.editorSnapshot = null;
 		this.renderToken += 1;
 		if (this.debounceTimer !== null) {
 			window.clearTimeout(this.debounceTimer);
 			this.debounceTimer = null;
 		}
 		this.iframe.srcdoc = "";
+		this.toolbar.setBusy(false);
 		if (this.templateId && nextFilePath) void this.renderNow();
 	}
 
@@ -105,6 +114,10 @@ export class TemplatePreviewController {
 	private selectTemplate(templateId: string): void {
 		if (this.disposed) return;
 		if (!templateId) {
+			this.renderToken += 1;
+			if (this.debounceTimer !== null) window.clearTimeout(this.debounceTimer);
+			this.debounceTimer = null;
+			this.toolbar.setBusy(false);
 			this.templateId = "";
 			this.themeClass = "";
 			this.setPreviewVisible(false);
@@ -141,12 +154,21 @@ export class TemplatePreviewController {
 
 	private async renderNow(): Promise<void> {
 		if (this.disposed || !this.templateId || !this.view.file) return;
+		if (this.currentFilePath !== this.view.file.path) {
+			this.handleViewFileChange();
+			return;
+		}
 		const file = this.view.file;
-		this.currentFilePath = file.path;
+		const filePath = file.path;
 		const token = ++this.renderToken;
 		this.toolbar.setBusy(true);
 		try {
-			const raw = await readNoteMarkdown(this.plugin, file);
+			// Do not look up an active editor here: its file identity can already
+			// point at the new note while its buffer still contains the old one.
+			const raw = this.editorSnapshot?.path === filePath
+				? this.editorSnapshot.markdown
+				: await this.plugin.app.vault.read(file);
+			if (this.disposed || token !== this.renderToken || this.view.file?.path !== filePath) return;
 			const markdown = prepareMarkdown(raw);
 			const srcdoc = await renderLocalTemplatePreview({
 				app: this.plugin.app,
@@ -158,14 +180,14 @@ export class TemplatePreviewController {
 			if (
 				this.disposed ||
 				token !== this.renderToken ||
-				this.view.file?.path !== file.path
+				this.view.file?.path !== filePath
 			) return;
 			this.iframe.srcdoc = srcdoc;
 		} catch (error) {
 			if (
 				this.disposed ||
 				token !== this.renderToken ||
-				this.view.file?.path !== file.path
+				this.view.file?.path !== filePath
 			) return;
 			const message = error instanceof Error ? error.message : String(error);
 			this.iframe.srcdoc = this.buildErrorDocument(message);
