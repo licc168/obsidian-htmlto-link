@@ -224,3 +224,138 @@
 		padding: 88px 6px 6px;
 	}
 }
+
+/* Mermaid fullscreen viewer hosted in the Obsidian window. */
+body.htmlto-link-mermaid-fs-open {
+	overflow: hidden !important;
+}
+
+.htmlto-link-mermaid-fs {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	width: 100vw;
+	height: 100vh;
+	height: 100dvh;
+	flex-direction: column;
+	background: var(--background-primary);
+	overscroll-behavior: none;
+}
+
+.htmlto-link-mermaid-fs.is-active {
+	display: flex;
+}
+
+.htmlto-link-mermaid-fs-toolbar {
+	position: absolute;
+	top: max(12px, env(safe-area-inset-top, 0px));
+	right: max(12px, env(safe-area-inset-right, 0px));
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 14px;
+	background: color-mix(in srgb, var(--background-primary) 94%, transparent);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.htmlto-link-mermaid-fs-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	min-height: 40px;
+	padding: 0 10px;
+	border: 0;
+	border-radius: 10px;
+	background: transparent;
+	color: var(--text-normal);
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+	touch-action: manipulation;
+}
+
+.htmlto-link-mermaid-fs-btn:hover {
+	background: var(--background-modifier-hover);
+}
+
+.htmlto-link-mermaid-fs-btn:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+.htmlto-link-mermaid-fs-zoom-label {
+	min-width: 64px;
+	font-size: 13px;
+}
+
+.htmlto-link-mermaid-fs-canvas {
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	overflow: hidden;
+	cursor: grab;
+	touch-action: none;
+	background:
+		linear-gradient(90deg, color-mix(in srgb, var(--text-faint) 18%, transparent) 1px, transparent 1px),
+		linear-gradient(color-mix(in srgb, var(--text-faint) 18%, transparent) 1px, transparent 1px);
+	background-size: 24px 24px;
+	background-color: var(--background-secondary);
+}
+
+.htmlto-link-mermaid-fs-canvas.is-dragging {
+	cursor: grabbing;
+}
+
+.htmlto-link-mermaid-fs-stage {
+	transform-origin: 0 0;
+	width: max-content;
+}
+
+.htmlto-link-mermaid-fs-svg {
+	display: inline-block;
+	padding: 16px;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+}
+
+.htmlto-link-mermaid-fs-svg svg {
+	display: block;
+	max-width: none !important;
+	max-height: none !important;
+}
+
+.htmlto-link-mermaid-fs-hint {
+	position: absolute;
+	left: 50%;
+	bottom: max(16px, env(safe-area-inset-bottom, 0px));
+	z-index: 2;
+	transform: translateX(-50%);
+	padding: 6px 12px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--text-normal) 72%, transparent);
+	color: var(--background-primary);
+	font-size: 12px;
+	font-weight: 600;
+	pointer-events: none;
+	white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+	.htmlto-link-mermaid-fs-btn {
+		min-width: 44px;
+		min-height: 44px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.htmlto-link-mermaid-fs-stage {
+		transition: none !important;
+	}
+}

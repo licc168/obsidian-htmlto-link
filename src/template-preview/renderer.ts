@@ -34,6 +34,12 @@ body.share-page {
 .share-card-shell .card-content-inner .mermaid { width: 100%; max-width: 100%; margin: 1.2em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
 .share-card-shell .card-content-inner .mermaid svg { display: inline-block; max-width: none; height: auto; vertical-align: middle; }
 .share-card-shell .card-content-inner .mermaid svg.htmlto-link-mermaid-intrinsic { max-width: none; }
+.share-card-shell .htmlto-link-mermaid-wrapper { position: relative; display: block; width: 100%; margin: 1.2em 0; }
+.share-card-shell .htmlto-link-mermaid-wrapper > .mermaid { margin: 0; }
+.share-card-shell .htmlto-link-mermaid-zoom-btn { position: absolute; top: 8px; right: 8px; z-index: 5; display: inline-flex; align-items: center; justify-content: center; min-height: 32px; padding: 0 10px; border: 1px solid rgba(15, 23, 42, 0.14); border-radius: 8px; background: rgba(255,255,255,0.96); box-shadow: 0 1px 4px rgba(15,23,42,0.14); color: #334155; font-size: 12px; font-weight: 600; cursor: pointer; }
+.share-card-shell .htmlto-link-mermaid-zoom-btn:hover { background: #fff; color: #0f172a; }
+.share-card-shell .htmlto-link-mermaid-zoom-btn:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+
 .share-card-shell .card-content-inner .mermaid-error { padding: 12px 14px; border: 1px solid rgba(220, 38, 38, 0.28); border-radius: 8px; background: rgba(254, 226, 226, 0.72); color: #b91c1c; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .markdown-table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
 .markdown-table-wrapper > table { min-width: 100%; }

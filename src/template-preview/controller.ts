@@ -5,6 +5,10 @@ import { resolveThemeClassForTemplate } from "../constants";
 import { t } from "../i18n";
 import { renderLocalTemplatePreview } from "./renderer";
 import { TemplatePreviewToolbar } from "./toolbar";
+import {
+	MermaidFullscreenViewer,
+	bindMermaidFullscreenButtons,
+} from "./mermaid-fullscreen";
 
 interface ClipboardWriter {
 	writeText(value: string): Promise<void>;
@@ -28,6 +32,7 @@ export class TemplatePreviewController {
 	private debounceTimer: number | null = null;
 	private disposed = false;
 	private editorSnapshot: { path: string; markdown: string } | null = null;
+	private readonly mermaidFullscreen = new MermaidFullscreenViewer(document.body);
 
 	constructor(
 		private readonly plugin: HtmltoLinkPlugin,
@@ -61,6 +66,7 @@ export class TemplatePreviewController {
 		this.iframe.addEventListener("load", () => {
 			this.bindPreviewCopyButtons();
 			this.bindPreviewToc();
+			this.bindMermaidFullscreen();
 		});
 		this.setPreviewVisible(false);
 	}
@@ -69,6 +75,7 @@ export class TemplatePreviewController {
 		this.disposed = true;
 		this.renderToken += 1;
 		if (this.debounceTimer !== null) window.clearTimeout(this.debounceTimer);
+		this.mermaidFullscreen.destroy();
 		this.iframe.srcdoc = "";
 		this.root.remove();
 		this.host.removeClass("htmlto-link-template-preview-host");
@@ -182,6 +189,7 @@ export class TemplatePreviewController {
 				token !== this.renderToken ||
 				this.view.file?.path !== filePath
 			) return;
+			this.mermaidFullscreen.close();
 			this.iframe.srcdoc = srcdoc;
 		} catch (error) {
 			if (
@@ -348,7 +356,16 @@ export class TemplatePreviewController {
 		if (!visible) {
 			this.iframe.srcdoc = "";
 			this.toolbar.setValue("", "");
+			this.mermaidFullscreen.close();
 		}
+	}
+
+	private bindMermaidFullscreen(): void {
+		const previewDocument = this.iframe.contentDocument;
+		if (!previewDocument) return;
+		bindMermaidFullscreenButtons(previewDocument, (svg, opener) => {
+			this.mermaidFullscreen.open(svg, opener);
+		});
 	}
 }
 

@@ -1,3 +1,4 @@
+import { wrapMermaidDiagrams } from "./mermaid-fullscreen";
 type MermaidApi = typeof import("mermaid")["default"];
 
 let mermaidApiPromise: Promise<MermaidApi> | null = null;
@@ -137,7 +138,12 @@ export async function renderMermaidInHtml(html: string): Promise<string> {
 
 		const preservedExistingSizes = preserveExistingMermaidSizes(root);
 		const targets = collectMermaidTargets(root);
-		if (targets.length === 0) return preservedExistingSizes ? root.innerHTML : html;
+		if (targets.length === 0) {
+			wrapMermaidDiagrams(root);
+			return preservedExistingSizes || root.querySelector(".htmlto-link-mermaid-wrapper")
+				? root.innerHTML
+				: html;
+		}
 
 		let mermaid: MermaidApi;
 		try {
@@ -178,6 +184,7 @@ export async function renderMermaidInHtml(html: string): Promise<string> {
 			}
 		}
 
+		wrapMermaidDiagrams(root);
 		return root.innerHTML;
 	} finally {
 		root.remove();

@@ -78,6 +78,13 @@ const dict = {
 		previewRendering: "Rendering locally…",
 		previewFrameTitle: "Local template preview",
 		previewFailed: "Local preview failed",
+		previewMermaidFullscreen: "View fullscreen",
+		previewMermaidFit: "Fit",
+		previewMermaidZoomOut: "Zoom out",
+		previewMermaidZoomIn: "Zoom in",
+		previewMermaidClose: "Close",
+		previewMermaidHint: "Scroll to zoom · drag to move · Esc to close",
+		previewMermaidDialog: "Diagram fullscreen view",
 
     // publish modal
     publishTitle: "Share Page",
@@ -253,6 +260,13 @@ const dict = {
 		previewRendering: "正在本地渲染…",
 		previewFrameTitle: "本地模板预览",
 		previewFailed: "本地预览失败",
+		previewMermaidFullscreen: "全屏查看",
+		previewMermaidFit: "适应",
+		previewMermaidZoomOut: "缩小",
+		previewMermaidZoomIn: "放大",
+		previewMermaidClose: "关闭",
+		previewMermaidHint: "滚轮缩放 · 拖拽移动 · Esc 关闭",
+		previewMermaidDialog: "图表全屏查看",
 
     publishTitle: "Share Page",
     notePrefix: "笔记：",
