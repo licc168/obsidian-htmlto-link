@@ -226,8 +226,8 @@
 }
 
 /* Mermaid fullscreen viewer hosted in the Obsidian window. */
-body.htmlto-link-mermaid-fs-open {
-	overflow: hidden !important;
+html body.htmlto-link-mermaid-fs-open {
+	overflow: hidden;
 }
 
 .htmlto-link-mermaid-fs {
@@ -235,11 +235,9 @@ body.htmlto-link-mermaid-fs-open {
 	position: fixed;
 	inset: 0;
 	z-index: 99999;
-	width: 100vw;
-	height: 100vh;
-	height: 100dvh;
 	flex-direction: column;
 	background: var(--background-primary);
+	overflow: hidden;
 	overscroll-behavior: none;
 }
 
@@ -325,10 +323,10 @@ body.htmlto-link-mermaid-fs-open {
 	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
 }
 
-.htmlto-link-mermaid-fs-svg svg {
+.htmlto-link-mermaid-fs .htmlto-link-mermaid-fs-svg > svg {
 	display: block;
-	max-width: none !important;
-	max-height: none !important;
+	max-width: none;
+	max-height: none;
 }
 
 .htmlto-link-mermaid-fs-hint {
@@ -351,11 +349,5 @@ body.htmlto-link-mermaid-fs-open {
 	.htmlto-link-mermaid-fs-btn {
 		min-width: 44px;
 		min-height: 44px;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.htmlto-link-mermaid-fs-stage {
-		transition: none !important;
 	}
 }
