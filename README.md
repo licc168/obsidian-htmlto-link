@@ -8,6 +8,7 @@ Instantly share any Obsidian note as a beautiful webpage via [htmlto.link](https
 
 - **One-click share** — Ribbon, command palette (`Share current note`), or right-click a file
 - **Same URL on update** — Re-sharing a note updates the existing link; rename or move the file and it still matches
+- **Update on save** — Optional. Already-shared notes update the same URL when you save; the first share is still manual
 - **30+ templates** — Memo, Pop Art, Traditional Chinese, Coil Notebook, Cyberpunk, Glassmorphism, and more
 - **Theme variants** — Multiple color themes per template (e.g. Bright / Dark for Memo)
 - **Local template preview** — Switch template and theme from the top-right of the current Markdown page without publishing or uploading the note
@@ -49,6 +50,8 @@ Copy `main.js`, `manifest.json`, `styles.css` to your vault's plugin directory.
 
 To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
 
+To keep a public link in sync: share the note once, then enable **Update share on save** in plugin settings. Later saves update that same URL after a short pause. This does not create a new link if the old one expired.
+
 ## Settings
 
 | Setting | Description |
@@ -60,13 +63,14 @@ To remove a share: `Ctrl/Cmd + P` → **Delete share for current note**.
 | Copy link on success | Enabled by default |
 | Open in browser | Disabled by default |
 | Write share info to note | Writes `share_link` / `share_updated` to frontmatter |
+| Update share on save | Disabled by default. Saving an already-shared note updates the same public URL |
 | Show options on publish | Template & theme picker dialog |
 
 Template preview is not a separate setting. It is enabled from the Markdown page controls and remains separate from publishing.
 
 ## Privacy & Data
 
-- **Network access:** Template preview runs locally and does not send the note content or upload local images. When you publish, the plugin sends the current note's Markdown and referenced local images to the configured API server to create or update the share page. Deleting a share also contacts that server. Requests are made only for these user-initiated operations; the plugin does not scan or upload the rest of the vault.
+- **Network access:** Template preview runs locally and does not send the note content or upload local images. When you publish, the plugin sends the current note's Markdown and referenced local images to the configured API server to create or update the share page. If **Update share on save** is enabled, saving an already-shared note also uploads that note and its referenced local images to update the existing page. Deleting a share also contacts that server. The plugin does not scan or upload the rest of the vault.
 - **Server-side storage:** The configured service stores the published note content and uploaded images to serve the resulting public page. Anyone with the public share URL may be able to view the published content. The current service does not provide end-to-end encryption for this plugin's shares.
 - **Retention:** Guest shares expire after 24 hours. Account-bound shares follow the retention period returned by the service and the applicable plan. Use **Delete share for current note** to request deletion of a share.
 - **Telemetry:** The plugin does not send startup pings or client-side usage analytics. The service may record the minimum request information needed to operate the publishing API; see the [HTML To Link Privacy Policy](https://htmlto.link/privacy-policy).
@@ -96,6 +100,7 @@ obsidian-htmlto-link/
 │   ├── constants.ts   # Defaults / templates
 │   ├── api.ts         # API client
 │   ├── publish.ts     # Share & delete logic
+│   ├── auto-update.ts # Optional update-on-save
 │   ├── template-preview/ # Local template preview
 │   └── i18n.ts        # Internationalization
 ├── scripts/

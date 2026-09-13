@@ -130,6 +130,11 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 						"writeFrontmatterDesc",
 						"writeShareToNote",
 					),
+					this.createToggleDefinition(
+						"autoUpdateOnSaveName",
+						"autoUpdateOnSaveDesc",
+						"autoUpdateOnSave",
+					),
 				],
 			},
 			{
@@ -281,6 +286,18 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 					}),
 			);
 
+		new Setting(containerEl)
+			.setName(t("autoUpdateOnSaveName"))
+			.setDesc(t("autoUpdateOnSaveDesc"))
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.autoUpdateOnSave)
+					.onChange(async (value) => {
+						this.plugin.settings.autoUpdateOnSave = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
 		new Setting(containerEl).setName(t("tipsTitle")).setHeading();
 		const tips = containerEl.createEl("ul");
 		const hasToken = this.plugin.settings.apiToken.trim().length > 0;
@@ -299,6 +316,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 		}
 		tips.createEl("li", { text: t("tipThemes") });
 		tips.createEl("li", { text: t("tipImages") });
+		tips.createEl("li", { text: t("tipAutoUpdate") });
 		tips.createEl("li", { text: t("tipCommand") });
 	}
 
@@ -347,7 +365,8 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			| "showOptionsOnPublish"
 			| "copyLinkOnSuccess"
 			| "openInBrowser"
-			| "writeShareToNote",
+			| "writeShareToNote"
+			| "autoUpdateOnSave",
 	): SettingDefinition {
 		return {
 			name: t(nameKey),
@@ -376,6 +395,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 				: []),
 			{ name: t("tipThemes") },
 			{ name: t("tipImages") },
+			{ name: t("tipAutoUpdate") },
 			{ name: t("tipCommand") },
 		];
 	}

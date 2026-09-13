@@ -33,6 +33,9 @@ const dict = {
     writeFrontmatterName: "Write share info to frontmatter",
     writeFrontmatterDesc:
       "After sharing, write share_link and share_updated into the note's frontmatter (Properties).",
+    autoUpdateOnSaveName: "Update share on save",
+    autoUpdateOnSaveDesc:
+      "When enabled, saving an already-shared note updates the same public URL. The first share is still manual. Rapid edits are batched; this never creates a new link.",
     tipsTitle: "Notes",
     tipTokenFilled:
       "API Token set: the share link belongs to your account and lasts longer per your plan.",
@@ -45,6 +48,13 @@ const dict = {
       "Only Memo / Pop Art / Coil Notebook support multiple themes; others use a fixed style.",
     tipImages:
       "Local images (![[...]] / ![](...)) are uploaded to htmlto.link automatically when you share, then rewritten to public URLs. The original note is not modified.",
+    tipAutoUpdate:
+      "Update share on save only affects notes you have already shared. Turn it off anytime; expired or deleted pages are not replaced with a new URL.",
+    autoUpdateSuccess: "Share updated",
+    autoUpdateFailed: "Auto-update failed: ",
+    autoUpdateExpired:
+      "This share is gone or expired. Share the note again to get a new link.",
+    autoUpdatePaused: "Auto-update paused for this note: ",
     imageUploadPartialFail:
       "{count} local image(s) failed to upload and were left unchanged.",
 		tipCommand: "Share from the command palette, the left ribbon, or right-click a Markdown file.",
@@ -220,6 +230,9 @@ const dict = {
     writeFrontmatterName: "将分享信息写入笔记属性",
     writeFrontmatterDesc:
       "分享成功后，将 share_link 和 share_updated 写入笔记的 frontmatter（属性）中。",
+    autoUpdateOnSaveName: "保存时自动更新分享",
+    autoUpdateOnSaveDesc:
+      "开启后，已分享的笔记在保存时会更新同一条公开链接。第一次仍需手动分享；连续编辑会合并成一次更新，失败时不会改成新网址。",
     tipsTitle: "说明",
     tipTokenFilled: "已填写 API Token：分享链接归属于你的账号，按套餐享受更长有效期。",
     tipTokenGuest: "未填写 Token 时走游客模式：分享链接仅保留 24 小时。",
@@ -228,6 +241,12 @@ const dict = {
     tipThemes: "仅「备忘录 / 波普艺术 / 线圈笔记本」支持多主题，其他模板为固定样式。",
     tipImages:
       "分享时会自动上传本地图片（![[...]] / ![](...)）到 htmlto.link，并改写成公开链接；不会修改你 vault 里的原笔记。",
+    tipAutoUpdate:
+      "「保存时自动更新分享」只作用于已经分享过的笔记。可随时关闭；链接过期或被删除后，不会自动改成新网址。",
+    autoUpdateSuccess: "分享已更新",
+    autoUpdateFailed: "自动更新失败：",
+    autoUpdateExpired: "该分享已失效或过期。请重新手动分享以获取新链接。",
+    autoUpdatePaused: "已暂停该笔记的自动更新：",
     imageUploadPartialFail: "有 {count} 张本地图片上传失败，已保留原引用。",
     tipCommand: "可用命令面板、左侧功能区，或在文件列表里右键 Markdown 笔记来分享。",
     commandPublish: "分享当前笔记",

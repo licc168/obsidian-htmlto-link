@@ -8,11 +8,13 @@ import {
 	deleteShareNote,
 } from "./publish";
 import { initI18n, t } from "./i18n";
+import { AutoUpdateController } from "./auto-update";
 import { handleVaultDelete, handleVaultRename } from "./share-index";
 import { TemplatePreviewManager } from "./template-preview/manager";
 
 export default class HtmltoLinkPlugin extends Plugin {
 	settings!: HtmltoLinkSettings;
+	autoUpdate?: AutoUpdateController;
 	private templatePreviewManager?: TemplatePreviewManager;
 
 	async onload() {
@@ -66,6 +68,7 @@ export default class HtmltoLinkPlugin extends Plugin {
 		this.addSettingTab(new HtmltoLinkSettingTab(this.app, this));
 
 		this.templatePreviewManager = new TemplatePreviewManager(this);
+		this.autoUpdate = new AutoUpdateController(this);
 		this.app.workspace.onLayoutReady(() => {
 			this.templatePreviewManager?.sync();
 		});
@@ -89,7 +92,9 @@ export default class HtmltoLinkPlugin extends Plugin {
 		);
 		this.registerEvent(
 			this.app.vault.on("modify", (file) => {
-				if (file instanceof TFile) this.templatePreviewManager?.onFileChange(file);
+				if (!(file instanceof TFile)) return;
+				this.templatePreviewManager?.onFileChange(file);
+				this.autoUpdate?.onFileModify(file);
 			}),
 		);
 
@@ -109,11 +114,13 @@ export default class HtmltoLinkPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.vault.on("rename", (file, oldPath) => {
+				this.autoUpdate?.cancel(oldPath);
 				void handleVaultRename(this, file, oldPath);
 			}),
 		);
 		this.registerEvent(
 			this.app.vault.on("delete", (file) => {
+				this.autoUpdate?.cancel(file.path);
 				void handleVaultDelete(this, file);
 			}),
 		);
@@ -150,6 +157,8 @@ export default class HtmltoLinkPlugin extends Plugin {
 	}
 
 	onunload() {
+		this.autoUpdate?.destroy();
+		this.autoUpdate = undefined;
 		this.templatePreviewManager?.destroy();
 		this.templatePreviewManager = undefined;
 	}
@@ -172,6 +181,9 @@ export default class HtmltoLinkPlugin extends Plugin {
 			this.settings.language !== "zh"
 		) {
 			this.settings.language = "auto";
+		}
+		if (typeof this.settings.autoUpdateOnSave !== "boolean") {
+			this.settings.autoUpdateOnSave = false;
 		}
 	}
 

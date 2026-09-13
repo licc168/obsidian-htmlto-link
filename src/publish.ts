@@ -1,6 +1,7 @@
 import { MarkdownView, Modal, Notice, TFile } from "obsidian";
 import type HtmltoLinkPlugin from "./main";
 import { createSharePage, deleteSharePage } from "./api";
+import { fingerprintMarkdown } from "./auto-update-core";
 import {
 	type NoteShareRecord,
 	resolveThemeClassForTemplate,
@@ -103,6 +104,20 @@ async function doPublish(
 	markdown: string,
 	options: PublishOptions,
 ): Promise<PublishSuccessInfo> {
+	plugin.autoUpdate?.cancel(file.path);
+	const run = () => publishNoteContent(plugin, file, markdown, options);
+	if (plugin.autoUpdate) {
+		return plugin.autoUpdate.mutex.run(file.path, run);
+	}
+	return run();
+}
+
+async function publishNoteContent(
+	plugin: HtmltoLinkPlugin,
+	file: TFile,
+	markdown: string,
+	options: PublishOptions,
+): Promise<PublishSuccessInfo> {
 	const themeClass = resolveThemeClassForTemplate(
 		options.templateId,
 		options.themeClass,
@@ -173,6 +188,9 @@ async function doPublish(
 			updatedAt: new Date().toISOString(),
 			temporary: result.temporary,
 			expiresAt: result.expiresAt,
+			templateId: options.templateId,
+			themeClass,
+			contentHash: fingerprintMarkdown(markdown),
 		});
 	}
 

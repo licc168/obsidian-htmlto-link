@@ -8,11 +8,13 @@ import {
 } from "./json";
 
 /** 区分网络错误与业务错误，便于上层决定是否回退到新建 */
-class ApiError extends Error {
+export class ApiError extends Error {
 	isNetwork: boolean;
-	constructor(message: string, isNetwork = false) {
+	status?: number;
+	constructor(message: string, isNetwork = false, status?: number) {
 		super(message);
 		this.isNetwork = isNetwork;
+		this.status = status;
 	}
 }
 
@@ -119,7 +121,7 @@ async function requestJson(
 	try {
 		data = parseCreateShareResponse(res.text);
 	} catch {
-		throw new ApiError(t("invalidJson") + res.status + ")", false);
+		throw new ApiError(t("invalidJson") + res.status + ")", false, res.status);
 	}
 
 	return { status: res.status, data };
@@ -132,7 +134,7 @@ function finalizeResponse(
 ): CreateShareResult {
 	const ok = Boolean(data.success || data.ok);
 	if (status >= 400 || !ok) {
-		throw new ApiError(data.error || t("httpFailed") + status + ")", false);
+		throw new ApiError(data.error || t("httpFailed") + status + ")", false, status);
 	}
 
 	const url = data.url ?? (data.slug ? `${base}/${data.slug}` : undefined);
@@ -189,6 +191,38 @@ export async function deleteSharePage(
 		}
 		throw new ApiError(errMsg, false);
 	}
+}
+
+/**
+ * 只更新已有分享，失败时不新建 URL。
+ * 保存时自动更新必须走这条路径，避免过期后悄悄换成新链接。
+ */
+export async function updateSharePage(
+	settings: HtmltoLinkSettings,
+	payload: CreateShareRequest,
+): Promise<CreateShareResult> {
+	const slug = payload.slug;
+	const updateToken = payload.updateToken;
+	if (!slug || !updateToken) {
+		throw new ApiError(t("noUrl"), false);
+	}
+
+	const base = settings.apiBaseUrl.replace(/\/+$/, "");
+	const apiToken = settings.apiToken.trim();
+	const updateUrl = `${base}/api/shares/${encodeURIComponent(slug)}`;
+	const { status, data } = await requestJson(
+		updateUrl,
+		"PUT",
+		buildBody(settings, payload, true),
+		apiToken,
+	);
+
+	return finalizeResponse(base, status, {
+		...data,
+		updateToken: data.updateToken || updateToken,
+		slug: data.slug || slug,
+		updated: true,
+	});
 }
 
 /**

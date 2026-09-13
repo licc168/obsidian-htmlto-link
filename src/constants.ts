@@ -17,6 +17,13 @@ export interface NoteShareRecord {
 	/** 最近一次服务端返回的归属状态；旧配置缺失时保持兼容 */
 	temporary?: boolean;
 	expiresAt?: string;
+	/** 上次成功发布该笔记时用的模板；自动更新沿用，避免被全局默认模板带跑 */
+	templateId?: string;
+	themeClass?: string;
+	/** prepareMarkdown 后的指纹，内容没变就跳过 */
+	contentHash?: string;
+	/** 自动更新连续失败时暂停，直到用户再次手动分享 */
+	autoUpdatePaused?: boolean;
 }
 
 /** 插件界面语言：auto 跟随 Obsidian，en/zh 手动指定 */
@@ -41,6 +48,8 @@ export interface HtmltoLinkSettings {
 	writeShareToNote: boolean;
 	/** 发布时是否弹出模板/主题选择框 */
 	showOptionsOnPublish: boolean;
+	/** 已分享笔记保存后，自动 PUT 更新同一链接（默认关闭） */
+	autoUpdateOnSave: boolean;
 	/**
 	 * 按 vault 文件路径缓存已上传图片，文件未变化时直接复用公开 URL
 	 * key = TFile.path
@@ -63,6 +72,7 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	openInBrowser: false,
 	writeShareToNote: true,
 	showOptionsOnPublish: true,
+	autoUpdateOnSave: false,
 	uploadedAssets: {},
 	noteShares: {},
 };
