@@ -407,7 +407,8 @@ let currentLang: "en" | "zh" = "en";
 
 /** 使用 Obsidian 官方 getLanguage() API 探测界面是否为中文 */
 function detectObsidianIsZh(): boolean {
-  return getLanguage().toLowerCase().startsWith("zh");
+  const language: unknown = getLanguage();
+  return typeof language === "string" && language.toLowerCase().startsWith("zh");
 }
 
 /**

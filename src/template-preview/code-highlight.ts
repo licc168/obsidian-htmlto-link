@@ -66,7 +66,7 @@ function highlightCodeBlock(root: HTMLElement, pre: HTMLPreElement): void {
 			highlightedHtml = result.value;
 			detectedLanguage = result.language ?? "";
 		}
-	} catch (error) {
+	} catch (error: unknown) {
 		console.warn("HTML to Link: 代码高亮失败", error);
 		highlightedHtml = source
 			.replace(/&/g, "&amp;")

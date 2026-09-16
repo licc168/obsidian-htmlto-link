@@ -74,7 +74,7 @@ Template preview is not a separate setting. It is enabled from the Markdown page
 - **Server-side storage:** The configured service stores the published note content and uploaded images to serve the resulting public page. Anyone with the public share URL may be able to view the published content. The current service does not provide end-to-end encryption for this plugin's shares.
 - **Retention:** Guest shares expire after 24 hours. Account-bound shares follow the retention period returned by the service and the applicable plan. Use **Delete share for current note** to request deletion of a share.
 - **Telemetry:** The plugin does not send startup pings or client-side usage analytics. The service may record the minimum request information needed to operate the publishing API; see the [HTML To Link Privacy Policy](https://htmlto.link/privacy-policy).
-- **Clipboard access:** After a successful publish, the plugin writes only the resulting public URL to the clipboard when “Copy link on success” is enabled.
+- **Clipboard access:** The plugin only writes to the clipboard. After a successful publish it copies the public URL when “Copy link on success” is enabled, and the local template preview can copy a code block you click. It never reads the clipboard, so it cannot expose content copied from outside Obsidian.
 - **Vault access:** The plugin reads only the note being shared and its referenced local images. It writes `share_link` and `share_updated` to that note only when the corresponding setting is enabled.
 - **Local data:** Settings, share-update tokens, and image cache records are stored through Obsidian's plugin data API.
 

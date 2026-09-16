@@ -10,7 +10,13 @@
 		"moduleResolution": "node",
 		"importHelpers": true,
 		"isolatedModules": true,
-		"lib": ["DOM", "ES5", "ES6", "ES7", "ES2017"]
+		"skipLibCheck": true,
+		"lib": ["DOM", "ES5", "ES6", "ES7", "ES2017"],
+		"paths": {
+			"obsidian": ["types/obsidian.d.ts"],
+			"mermaid": ["types/mermaid.d.ts"],
+			"highlight.js/lib/common": ["types/highlightjs.d.ts"]
+		}
 	},
-	"include": ["**/*.ts"]
+	"include": ["**/*.ts", "types/**/*.d.ts"]
 }

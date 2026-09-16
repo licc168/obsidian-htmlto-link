@@ -199,7 +199,7 @@ export class TemplatePreviewController {
 			this.mermaidFullscreen.close();
 			this.tableFullscreen.close();
 			this.iframe.srcdoc = srcdoc;
-		} catch (error) {
+		} catch (error: unknown) {
 			if (
 				this.disposed ||
 				token !== this.renderToken ||

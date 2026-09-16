@@ -149,7 +149,7 @@ export async function renderMermaidInHtml(html: string): Promise<string> {
 		try {
 			mermaid = await loadMermaid();
 			initializeMermaid(mermaid);
-		} catch (error) {
+		} catch (error: unknown) {
 			const message = getMermaidErrorMessage(error);
 			for (const target of targets) {
 				target.replaceWith(createMermaidError(root, message));
@@ -177,7 +177,7 @@ export async function renderMermaidInHtml(html: string): Promise<string> {
 				const rendered = root.createDiv({ cls: "mermaid" });
 				rendered.appendChild(document.importNode(svg, true));
 				target.replaceWith(rendered);
-			} catch (error) {
+			} catch (error: unknown) {
 				const message = getMermaidErrorMessage(error);
 				console.warn("HTML to Link: Mermaid 渲染失败", error);
 				target.replaceWith(createMermaidError(root, message));

@@ -1,6 +1,6 @@
 {
 	"name": "htmlto-link-obsidian",
-	"version": "0.1.29",
+	"version": "0.1.30",
 	"description": "Instantly share an Obsidian note as a beautiful webpage and copy the public link",
 	"main": "main.js",
 	"scripts": {
@@ -30,6 +30,7 @@
 		"eslint-plugin-obsidianmd": "^0.4.2",
 		"obsidian": "latest",
 		"tslib": "2.4.0",
+		"type-fest": "^4.41.0",
 		"typescript": "5.8.3",
 		"typescript-eslint": "^8.68.0"
 	},

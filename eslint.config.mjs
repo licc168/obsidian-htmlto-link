@@ -9,6 +9,7 @@ export default defineConfig([
 			"Vault/**",
 			"index.html",
 			"marketplace.js",
+			"types/**",
 		],
 	},
 	{

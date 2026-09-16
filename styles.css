@@ -462,7 +462,7 @@ html body.htmlto-link-table-fs-open {
 	color: #1e293b;
 	font-size: 15px;
 	line-height: 1.65;
-	font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .htmlto-link-table-fs-content th,
