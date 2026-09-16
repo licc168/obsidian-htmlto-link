@@ -9,6 +9,10 @@ import {
 	MermaidFullscreenViewer,
 	bindMermaidFullscreenButtons,
 } from "./mermaid-fullscreen";
+import {
+	TableFullscreenViewer,
+	bindTableFullscreenButtons,
+} from "./table-fullscreen";
 
 interface ClipboardWriter {
 	writeText(value: string): Promise<void>;
@@ -33,6 +37,7 @@ export class TemplatePreviewController {
 	private disposed = false;
 	private editorSnapshot: { path: string; markdown: string } | null = null;
 	private readonly mermaidFullscreen = new MermaidFullscreenViewer(document.body);
+	private readonly tableFullscreen = new TableFullscreenViewer(document.body);
 
 	constructor(
 		private readonly plugin: HtmltoLinkPlugin,
@@ -67,6 +72,7 @@ export class TemplatePreviewController {
 			this.bindPreviewCopyButtons();
 			this.bindPreviewToc();
 			this.bindMermaidFullscreen();
+			this.bindTableFullscreen();
 		});
 		this.setPreviewVisible(false);
 	}
@@ -76,6 +82,7 @@ export class TemplatePreviewController {
 		this.renderToken += 1;
 		if (this.debounceTimer !== null) window.clearTimeout(this.debounceTimer);
 		this.mermaidFullscreen.destroy();
+		this.tableFullscreen.destroy();
 		this.iframe.srcdoc = "";
 		this.root.remove();
 		this.host.removeClass("htmlto-link-template-preview-host");
@@ -190,6 +197,7 @@ export class TemplatePreviewController {
 				this.view.file?.path !== filePath
 			) return;
 			this.mermaidFullscreen.close();
+			this.tableFullscreen.close();
 			this.iframe.srcdoc = srcdoc;
 		} catch (error) {
 			if (
@@ -198,6 +206,8 @@ export class TemplatePreviewController {
 				this.view.file?.path !== filePath
 			) return;
 			const message = error instanceof Error ? error.message : String(error);
+			this.mermaidFullscreen.close();
+			this.tableFullscreen.close();
 			this.iframe.srcdoc = this.buildErrorDocument(message);
 		} finally {
 			if (!this.disposed && token === this.renderToken) this.toolbar.setBusy(false);
@@ -357,6 +367,7 @@ export class TemplatePreviewController {
 			this.iframe.srcdoc = "";
 			this.toolbar.setValue("", "");
 			this.mermaidFullscreen.close();
+			this.tableFullscreen.close();
 		}
 	}
 
@@ -364,7 +375,17 @@ export class TemplatePreviewController {
 		const previewDocument = this.iframe.contentDocument;
 		if (!previewDocument) return;
 		bindMermaidFullscreenButtons(previewDocument, (svg, opener) => {
+			this.tableFullscreen.close();
 			this.mermaidFullscreen.open(svg, opener);
+		});
+	}
+
+	private bindTableFullscreen(): void {
+		const previewDocument = this.iframe.contentDocument;
+		if (!previewDocument) return;
+		bindTableFullscreenButtons(previewDocument, (table, opener) => {
+			this.mermaidFullscreen.close();
+			this.tableFullscreen.open(table, opener);
 		});
 	}
 }

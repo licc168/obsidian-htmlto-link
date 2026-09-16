@@ -5,6 +5,7 @@ import {
 	getPreviewThemeClass,
 } from "./registry";
 import { renderMermaidInHtml } from "./mermaid";
+import { wrapTablesForFullscreen } from "./table-fullscreen";
 import { highlightCodeBlocks } from "./code-highlight";
 import { t } from "../i18n";
 
@@ -36,12 +37,21 @@ body.share-page {
 .share-card-shell .card-content-inner .mermaid svg.htmlto-link-mermaid-intrinsic { max-width: none; }
 .share-card-shell .htmlto-link-mermaid-wrapper { position: relative; display: block; width: 100%; margin: 1.2em 0; }
 .share-card-shell .htmlto-link-mermaid-wrapper > .mermaid { margin: 0; }
-.share-card-shell .htmlto-link-mermaid-zoom-btn { position: absolute; top: 8px; right: 8px; z-index: 5; display: inline-flex; align-items: center; justify-content: center; min-height: 32px; padding: 0 10px; border: 1px solid rgba(15, 23, 42, 0.14); border-radius: 8px; background: rgba(255,255,255,0.96); box-shadow: 0 1px 4px rgba(15,23,42,0.14); color: #334155; font-size: 12px; font-weight: 600; cursor: pointer; }
-.share-card-shell .htmlto-link-mermaid-zoom-btn:hover { background: #fff; color: #0f172a; }
-.share-card-shell .htmlto-link-mermaid-zoom-btn:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+.share-card-shell .htmlto-link-mermaid-zoom-btn,
+.share-card-shell .htmlto-link-table-zoom-btn { position: absolute; top: 8px; right: 8px; z-index: 5; display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 32px; min-height: 32px; padding: 0 10px; border: 1px solid rgba(15, 23, 42, 0.14); border-radius: 8px; background: rgba(255,255,255,0.96); box-shadow: 0 1px 4px rgba(15,23,42,0.14); color: #334155; font-size: 12px; font-weight: 600; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1; letter-spacing: 0; text-transform: none; white-space: nowrap; cursor: pointer; appearance: none; -webkit-appearance: none; user-select: none; }
+.share-card-shell .htmlto-link-mermaid-zoom-btn:hover,
+.share-card-shell .htmlto-link-table-zoom-btn:hover { background: #fff; color: #0f172a; }
+.share-card-shell .htmlto-link-mermaid-zoom-btn:focus-visible,
+.share-card-shell .htmlto-link-table-zoom-btn:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+.share-card-shell .htmlto-link-table-zoom-btn svg { width: 14px; height: 14px; display: block; flex-shrink: 0; }
+@media (max-width: 640px) {
+  .share-card-shell .htmlto-link-table-zoom-btn span { display: none; }
+  .share-card-shell .htmlto-link-table-zoom-btn { width: 32px; padding: 0; }
+}
 
 .share-card-shell .card-content-inner .mermaid-error { padding: 12px 14px; border: 1px solid rgba(220, 38, 38, 0.28); border-radius: 8px; background: rgba(254, 226, 226, 0.72); color: #b91c1c; text-align: left; white-space: normal; overflow-wrap: anywhere; }
-.markdown-table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
+.markdown-table-wrapper { position: relative; width: 100%; max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
+.markdown-table-wrapper:has(> .htmlto-link-table-zoom-btn) { padding-top: 44px; }
 .markdown-table-wrapper > table { min-width: 100%; }
 .preview-empty { padding: 48px 24px; color: #64748b; text-align: center; }
 .share-toc { position: fixed; top: 24px; right: max(16px, calc((100vw - 70rem) / 2)); z-index: 20; width: 220px; max-height: calc(100vh - 48px); overflow: auto; padding: 12px; border: 1px solid rgba(100, 116, 139, 0.24); border-radius: 14px; background: rgba(255, 255, 255, 0.92); color: #334155; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
@@ -247,6 +257,7 @@ function normalizeTableWrappers(html: string): string {
 		wrapper.appendChild(table);
 	}
 
+	wrapTablesForFullscreen(root);
 	return root.innerHTML;
 }
 

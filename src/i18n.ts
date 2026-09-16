@@ -95,6 +95,10 @@ const dict = {
 		previewMermaidClose: "Close",
 		previewMermaidHint: "Scroll to zoom · drag to move · Esc to close",
 		previewMermaidDialog: "Diagram fullscreen view",
+		previewTableFullscreen: "View fullscreen",
+		previewTableReset: "100%",
+		previewTableResetAria: "Reset to 100%",
+		previewTableDialog: "Table fullscreen view",
 
     // publish modal
     publishTitle: "Share Page",
@@ -286,6 +290,10 @@ const dict = {
 		previewMermaidClose: "关闭",
 		previewMermaidHint: "滚轮缩放 · 拖拽移动 · Esc 关闭",
 		previewMermaidDialog: "图表全屏查看",
+		previewTableFullscreen: "全屏查看",
+		previewTableReset: "100%",
+		previewTableResetAria: "还原 100%",
+		previewTableDialog: "表格全屏查看",
 
     publishTitle: "Share Page",
     notePrefix: "笔记：",

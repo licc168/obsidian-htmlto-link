@@ -351,3 +351,179 @@ html body.htmlto-link-mermaid-fs-open {
 		min-height: 44px;
 	}
 }
+
+/* Table fullscreen viewer hosted in the Obsidian window. */
+html body.htmlto-link-table-fs-open {
+	overflow: hidden;
+}
+
+.htmlto-link-table-fs {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	flex-direction: column;
+	background: #fff;
+	overflow: hidden;
+	overscroll-behavior: none;
+}
+
+.htmlto-link-table-fs.is-active {
+	display: flex;
+}
+
+.htmlto-link-table-fs-toolbar {
+	position: absolute;
+	top: max(12px, env(safe-area-inset-top, 0px));
+	right: max(12px, env(safe-area-inset-right, 0px));
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 14px;
+	background: color-mix(in srgb, var(--background-primary) 94%, transparent);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.htmlto-link-table-fs-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	min-height: 40px;
+	padding: 0 10px;
+	border: 0;
+	border-radius: 10px;
+	background: transparent;
+	color: var(--text-normal);
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+	touch-action: manipulation;
+}
+
+.htmlto-link-table-fs-btn:hover {
+	background: var(--background-modifier-hover);
+}
+
+.htmlto-link-table-fs-btn:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+.htmlto-link-table-fs-zoom-label {
+	min-width: 64px;
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.htmlto-link-table-fs-canvas {
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	overflow: hidden;
+	cursor: grab;
+	touch-action: none;
+	background:
+		linear-gradient(90deg, color-mix(in srgb, var(--text-faint) 18%, transparent) 1px, transparent 1px),
+		linear-gradient(color-mix(in srgb, var(--text-faint) 18%, transparent) 1px, transparent 1px);
+	background-size: 24px 24px;
+	background-color: var(--background-secondary);
+}
+
+.htmlto-link-table-fs-canvas.is-dragging {
+	cursor: grabbing;
+}
+
+.htmlto-link-table-fs-stage {
+	transform-origin: 0 0;
+	will-change: transform;
+	width: 100%;
+}
+
+.htmlto-link-table-fs-content {
+	display: block;
+	box-sizing: border-box;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+	padding: 16px;
+}
+
+.htmlto-link-table-fs-content table {
+	border-collapse: collapse;
+	margin: 0;
+	width: 100%;
+	max-width: none;
+	table-layout: auto;
+	color: #1e293b;
+	font-size: 15px;
+	line-height: 1.65;
+	font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.htmlto-link-table-fs-content th,
+.htmlto-link-table-fs-content td {
+	border: 1px solid #e2e8f0;
+	padding: 10px 14px;
+	vertical-align: top;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.htmlto-link-table-fs-content th {
+	background: #eef3fb;
+	font-weight: 700;
+	color: #334155;
+	text-align: left;
+}
+
+.htmlto-link-table-fs-content th code,
+.htmlto-link-table-fs-content td code {
+	white-space: nowrap;
+	overflow-wrap: normal;
+	word-break: normal;
+	padding: 0.12em 0.4em;
+	border-radius: 4px;
+	background: #f1f5f9;
+	font-size: 0.92em;
+}
+
+.htmlto-link-table-fs-content th pre,
+.htmlto-link-table-fs-content td pre {
+	margin: 0;
+	max-width: 100%;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.htmlto-link-table-fs-hint {
+	position: absolute;
+	left: 50%;
+	bottom: max(16px, env(safe-area-inset-bottom, 0px));
+	z-index: 2;
+	transform: translateX(-50%);
+	padding: 6px 12px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--text-normal) 72%, transparent);
+	color: var(--background-primary);
+	font-size: 12px;
+	font-weight: 600;
+	pointer-events: none;
+	white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+	.htmlto-link-table-fs-btn {
+		min-width: 44px;
+		min-height: 44px;
+	}
+
+	.htmlto-link-table-fs-hint {
+		font-size: 11px;
+	}
+}

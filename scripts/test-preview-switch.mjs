@@ -5,7 +5,9 @@ import { transform } from "esbuild";
 
 // Exercise the real controller methods without requiring the Obsidian UI.
 const source = await readFile(new URL("../src/template-preview/controller.ts", import.meta.url), "utf8");
-const { code } = await transform(source.replace(/^import .*;\r?\n/gm, ""), {
+const { code } = await transform(
+  source.replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, ""),
+  {
   loader: "ts", format: "cjs",
 });
 const pending = [];
@@ -26,6 +28,8 @@ Object.assign(controller, {
   currentFilePath: a.path, templateId: "test", themeClass: "",
   renderToken: 0, debounceTimer: null, disposed: false, editorSnapshot: null,
   iframe: { srcdoc: "" }, toolbar: { setBusy() {} },
+  mermaidFullscreen: { close() {} },
+  tableFullscreen: { close() {} },
 });
 const flush = () => new Promise(setImmediate);
 const first = controller.renderNow();
