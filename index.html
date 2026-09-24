@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f0f0f" />
+    <meta name="description" content="Share Page — instantly share an Obsidian note as a beautiful webpage." />
+    <title>Share Page — Obsidian Plugins</title>
+    <link rel="stylesheet" href="marketplace.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Obsidian home">
+        <span class="obsidian-mark" aria-hidden="true"></span>
+        <span>Obsidian</span>
+      </a>
+      <div class="search-wrap">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input id="plugin-search" type="search" placeholder="Search plugins and themes..." aria-label="Search plugins and themes" />
+        <kbd>Ctrl K</kbd>
+      </div>
+      <button class="profile-button" type="button" aria-label="Open profile menu">
+        <span class="profile-avatar">✦</span>
+      </button>
+    </header>
+
+    <main id="top" class="page-shell">
+      <section class="plugin-hero" aria-labelledby="plugin-title">
+        <div class="hero-main">
+          <div class="plugin-heading">
+            <div class="plugin-icon" aria-hidden="true">
+              <span class="share-line share-line-one"></span>
+              <span class="share-line share-line-two"></span>
+              <span class="share-node share-node-top"></span>
+              <span class="share-node share-node-left"></span>
+              <span class="share-node share-node-right"></span>
+            </div>
+            <div>
+              <h1 id="plugin-title">Share Page</h1>
+              <div class="meta-line">
+                <span class="author-avatar">⌁</span>
+                <a href="#author">licc168</a>
+                <span class="meta-dot">•</span>
+                <span>212 downloads</span>
+              </div>
+            </div>
+          </div>
+          <p class="plugin-description">Instantly share a note as a beautiful webpage and copy the public link.</p>
+          <div class="hero-actions">
+            <button class="button button-primary" id="install-button" type="button">Add to Obsidian</button>
+            <div class="menu-wrap">
+              <button class="button button-icon" id="more-button" type="button" aria-label="More plugin actions" aria-expanded="false">•••</button>
+              <div class="overflow-menu" id="overflow-menu" hidden>
+                <a href="#details">View details</a>
+                <a href="#author">Visit author</a>
+                <a href="#report">Report plugin</a>
+              </div>
+            </div>
+          </div>
+
+          <nav class="content-tabs" aria-label="Plugin sections">
+            <button class="tab" data-tab="overview" type="button">Overview</button>
+            <button class="tab is-active" data-tab="scorecard" type="button">Scorecard</button>
+            <button class="tab" data-tab="updates" type="button">Updates <span class="tab-count">12</span></button>
+          </nav>
+
+          <div class="tab-panels">
+            <section class="tab-panel" id="overview-panel" data-panel="overview" aria-labelledby="plugin-title" hidden>
+              <div class="overview-card">
+                <div class="overview-callout">
+                  <span class="callout-symbol">⌁</span>
+                  <div>
+                    <strong>Work in progress</strong>
+                    <p>Scorecards are new and may contain errors. If you notice anything inaccurate, please let us know.</p>
+                  </div>
+                </div>
+                <div class="overview-grid">
+                  <div>
+                    <p class="eyebrow">About this plugin</p>
+                    <h2>Publish notes that feel like the web.</h2>
+                    <p class="body-copy">Share Page turns any Obsidian note into a polished, responsive webpage in one click. Pick a visual template, copy the link, and send it anywhere.</p>
+                  </div>
+                  <div class="feature-list">
+                    <div><span class="feature-icon feature-icon-share">↗</span><span>One-click publishing</span></div>
+                    <div><span class="feature-icon feature-icon-pages">▤</span><span>30+ templates</span></div>
+                    <div><span class="feature-icon feature-icon-sync">↻</span><span>Updates the same URL</span></div>
+                  </div>
+                </div>
+                <div class="overview-actions">
+                  <a href="#how-it-works">How it works <span>→</span></a>
+                  <a href="https://htmlto.link" target="_blank" rel="noreferrer">htmlto.link <span>↗</span></a>
+                </div>
+              </div>
+            </section>
+
+            <section class="tab-panel is-active" id="scorecard-panel" data-panel="scorecard">
+              <div class="scorecard-card">
+                <div class="scorecard-callout">
+                  <span class="callout-symbol">⌁</span>
+                  <div>
+                    <strong>Work in progress</strong>
+                    <p>Scorecards are new and may contain errors. If you notice anything inaccurate, please let us know.</p>
+                  </div>
+                </div>
+                <div class="score-section">
+                  <div class="score-heading"><h2>Health</h2><span class="status status-good">Excellent</span></div>
+                  <p class="score-summary">This plugin is actively maintained.</p>
+                  <div class="score-meter meter-green"><i></i><i></i><i></i><i></i></div>
+                  <div class="score-facts">
+                    <span>Hygiene <em>Has readme, license, description. Missing contributing guide.</em></span>
+                    <span>Maintenance <em>Last commit last week. 27 commits in the past year. Last release last week.</em></span>
+                    <span>Responsiveness <em>No issues filed.</em></span>
+                    <span>Adoption <em>30 installations, 2 stars.</em></span>
+                  </div>
+                </div>
+                <div class="score-section review-section">
+                  <div class="score-heading"><h2>Review</h2><span class="status status-caution">Caution</span></div>
+                  <p class="score-summary">44 issues found by automated scans of the latest release.</p>
+                  <div class="score-meter meter-orange"><i></i><i></i><i></i><i></i></div>
+                  <div class="finding-group"><h3>Passed <span>6</span></h3>
+                    <div class="finding passed"><b>✓</b><span>No obfuscated code detected.</span></div>
+                    <div class="finding passed"><b>✓</b><span>The <code>main.js</code> release asset has a verified GitHub artifact attestation.</span></div>
+                    <div class="finding passed"><b>✓</b><span>The <code>styles.css</code> release asset has a verified GitHub artifact attestation.</span></div>
+                    <div class="finding passed"><b>✓</b><span>Vault Read: Reads individual vault files via the Obsidian API (<code>vault.read</code>, <code>vault.cachedRead</code>)</span></div>
+                    <div class="finding passed"><b>✓</b><span>No vulnerable dependencies found.</span></div>
+                    <div class="finding passed"><b>✓</b><span>Build reproduced the release <code>main.js</code> byte-for-byte</span><b class="finding-arrow">›</b></div>
+                  </div>
+                  <div class="finding-group"><h3>Disclosures <span>3</span></h3>
+                    <div class="finding disclosure"><b>ⓘ</b><span>Plugin might make requests to external domains</span><b class="finding-arrow">›</b></div>
+                    <div class="finding disclosure"><b>ⓘ</b><span>Malware scan not available.</span><b class="finding-arrow">›</b></div>
+                    <div class="finding disclosure"><b>ⓘ</b><span>Network requests scan not available.</span><b class="finding-arrow">›</b></div>
+                  </div>
+                  <div class="finding-group"><h3>Warnings <span>40</span></h3>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>Unsafe member access on an <code>any</code> or typed value</span><em>15</em><b class="finding-arrow">›</b><small>Some values are inferred from external plugin APIs.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>Unsafe call of an <code>any</code> or typed value</span><em>8</em><b class="finding-arrow">›</b><small>Type information is unavailable for this API boundary.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>Unsafe assignment of an <code>any</code> or typed value</span><em>5</em><b class="finding-arrow">›</b><small>Values returned from the Obsidian API are narrowed at runtime.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>Uses <code>document.createElement</code> instead of Obsidian's <code>createEl</code> helpers</span><em>5</em><b class="finding-arrow">›</b><small>Used for the compact share link input and modal controls.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>Returns unsafe values from typed code</span><em>2</em><b class="finding-arrow">›</b><small>Values are supplied by the host application's plugin runtime.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>Unexpected use of <code>localStorage</code>: Prefer <code>app.vault</code></span><em>2</em><b class="finding-arrow">›</b><small>Local storage is used for a small, device-local preference.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>Avoid casting to <code>TFile</code>. Use an <code>instanceof TFile</code> check to safely narrow the type.</span><b class="finding-arrow">›</b><small>File objects are narrowed before publishing.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>This assertion is unnecessary since it does not change the type of the expression.</span><b class="finding-arrow">›</b><small>Safe to remove in a future cleanup pass.</small></button>
+                    <button class="finding warning expandable" type="button"><b>ⓘ</b><span>This PluginSettingTab does not implement <code>getSettingDefinitions</code>; its settings will not appear in Obsidian's settings search for users on 1.13.0 or later.</span><b class="finding-arrow">›</b><small>Settings remain available from the plugin settings panel.</small></button>
+                  </div>
+                  <div class="finding-group"><h3>Other <span>4</span></h3>
+                    <div class="finding other"><b>ⓘ</b><span><code>display</code> is deprecated. Since 1.13.0, use <code>@link.getSettingDefinitions</code> instead.</span><em>2</em></div>
+                    <div class="finding other"><b>ⓘ</b><span><strong>Clipboard Access:</strong> Reads or writes the system clipboard. May expose content copied from outside Obsidian.</span></div>
+                    <div class="finding other"><b>ⓘ</b><span><strong>Local Storage:</strong> Persists data in <code>localStorage</code> or <code>sessionStorage</code> instead of the Obsidian plugin data APIs</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="tab-panel" id="updates-panel" data-panel="updates" hidden>
+              <div class="updates-card">
+                <div class="updates-heading"><div><p class="eyebrow">Release history</p><h2>Small improvements, shipped often.</h2></div><span class="update-count">12 releases</span></div>
+                <div class="release"><span class="release-version">0.1.15</span><div><strong>Share Page</strong><p>Improve template previews and keep share links stable when notes move.</p></div><time>Last week</time></div>
+                <div class="release"><span class="release-version">0.1.14</span><div><strong>Share Page</strong><p>Add a guest-share reminder and improve success feedback.</p></div><time>2 weeks ago</time></div>
+                <div class="release"><span class="release-version">0.1.13</span><div><strong>Share Page</strong><p>Support more frontmatter values and refreshed localization.</p></div><time>Last month</time></div>
+                <a class="all-updates" href="#updates">View all updates <span>→</span></a>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <aside class="sidebar" aria-label="Plugin details">
+          <div class="sidebar-health">
+            <div><span>Health</span><strong>Excellent</strong></div>
+            <div class="mini-meter meter-green"><i></i><i></i><i></i></div>
+          </div>
+          <div class="sidebar-health sidebar-review">
+            <div><span>Review</span><strong>Caution</strong></div>
+            <div class="mini-meter meter-orange"><i></i><i></i><i></i></div>
+          </div>
+          <div class="sidebar-block" id="details">
+            <p class="sidebar-label">About</p>
+            <p>Share any Obsidian note as a styled webpage and copy the public link instantly via htmlto.link. Pick from 30+ templates and multiple theme variants, choose card widths (360–800px), never share linked files, write <code>share_link</code>/<code>share_updated</code> to frontmatter, and use a self-hostable API base URL.</p>
+            <div class="tag-row">
+              <span class="tag"><i class="tag-icon tag-publish">↗</i>Publishing</span>
+              <span class="tag"><i class="tag-icon tag-export">⇧</i>Export</span>
+              <span class="tag"><i class="tag-icon tag-properties">◉</i>Properties</span>
+            </div>
+          </div>
+          <div class="sidebar-block detail-block">
+            <p class="sidebar-label">Details</p>
+            <dl>
+              <div><dt>Current version</dt><dd>0.1.15</dd></div>
+              <div><dt>Last updated</dt><dd>Last week</dd></div>
+              <div><dt>Created</dt><dd>Last month</dd></div>
+              <div><dt>Updates</dt><dd>12 releases</dd></div>
+              <div><dt>Downloads</dt><dd>212</dd></div>
+              <div><dt>Compatible with</dt><dd>Obsidian 1.8.7+</dd></div>
+              <div><dt>Platforms</dt><dd>Desktop, Mobile</dd></div>
+              <div><dt>License</dt><dd>MIT</dd></div>
+            </dl>
+          </div>
+          <div class="sidebar-block author-block" id="author">
+            <p class="sidebar-label">Author</p>
+            <div class="author-row"><span class="large-author-avatar">✦</span><div><strong>licc168</strong><a href="#author">licc168</a></div></div>
+            <a class="github-link" href="https://github.com/licc168" target="_blank" rel="noreferrer"><span>◉</span> licc168 <span>↗</span></a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <h2 id="related-title">Related plugins</h2>
+        <div class="related-grid">
+          <a class="related-plugin" href="#related"><span class="related-icon icon-blue">➤</span><span><strong>Wechat Converter</strong><small>将Markdown转换为公众号排版，支持一键发布和主题样式。</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-pink">◉</span><span><strong>Share as Gist</strong><small>Share a note as a GitHub.com Gist.</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-indigo">◌</span><span><strong>Permalink Opener</strong><small>Open URLs based on a permalink or slug in the note properties.</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-violet">ϟ</span><span><strong>Advanced Canvas</strong><small>Supercharge your canvas experience. Create presentations, flowcharts and more.</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-yellow">▤</span><span><strong>Meta Bind</strong><small>Make your notes interactive with inline input fields, metadata displays, and buttons.</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-purple">⇧</span><span><strong>Share Note</strong><small>Instantly share/publish a note, with the full theme and content exactly like you see in Obsidian.</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-violet">◫</span><span><strong>Update modified date</strong><small>Automatically update a frontmatter modified date field when the file is modified.</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-lilac">□</span><span><strong>MetaEdit</strong><small>Manage your metadata.</small></span></a>
+          <a class="related-plugin" href="#related"><span class="related-icon icon-indigo">▧</span><span><strong>Featured Image</strong><small>Automatically set a featured image property in your notes based on the first image.</small></span></a>
+        </div>
+      </section>
+
+      <div class="breadcrumbs"><a href="#community">Community</a><span>›</span><a href="#plugins">Plugins</a><span>›</span><a href="#publishing">Publishing</a><span>›</span><strong>Share Page</strong></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand"><a class="brand" href="#top"><span class="obsidian-mark" aria-hidden="true"></span><span>Obsidian</span></a><p>Follow us</p><div class="social-links"><a href="#discord">Discord</a><a href="#twitter">Twitter</a><a href="#bluesky">Bluesky</a><a href="#threads">Threads</a><a href="#mastodon">Mastodon</a><a href="#youtube">YouTube</a><a href="#github">GitHub</a></div><small>© 2026 Obsidian</small></div>
+        <div class="footer-column"><p>Get started</p><a href="#download">Download</a><a href="#pricing">Pricing</a><a href="#enterprise">Enterprise</a><a href="#account">Account</a><p class="footer-subheading">Obsidian</p><a href="#overview">Overview</a><a href="#sync">Sync</a><a href="#publish">Publish</a><a href="#canvas">Canvas</a><a href="#mobile">Mobile</a><a href="#clipper">Web Clipper</a><a href="#cli">CLI</a></div>
+        <div class="footer-column"><p>Learn</p><a href="#help">Help</a><a href="#developers">Developers</a><a href="#changelog">Changelog</a><a href="#about">About</a><a href="#roadmap">Roadmap</a><a href="#blog">Blog</a><p class="footer-subheading">Resources</p><a href="#system-status">System status</a><a href="#license">License overview</a><a href="#terms">Terms of service</a><a href="#privacy">Privacy policy</a><a href="#security">Security</a></div>
+        <div class="footer-column"><p>Community</p><a href="#plugins">Plugins</a><a href="#themes">Themes</a><a href="#discord-community">Discord</a><a href="#forum">Forum / 中文论坛</a><a href="#merch">Merch store</a><a href="#brand">Brand guidelines</a></div>
+      </div>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="marketplace.js"></script>
+  </body>
+</html>
