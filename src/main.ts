@@ -185,6 +185,15 @@ export default class HtmltoLinkPlugin extends Plugin {
 		if (typeof this.settings.autoUpdateOnSave !== "boolean") {
 			this.settings.autoUpdateOnSave = false;
 		}
+		if (typeof this.settings.previewToolbarCollapsed !== "boolean") {
+			this.settings.previewToolbarCollapsed = false;
+		}
+	}
+
+	setPreviewToolbarCollapsed(collapsed: boolean): void {
+		this.settings.previewToolbarCollapsed = collapsed;
+		void this.saveSettings();
+		this.templatePreviewManager?.setToolbarCollapsed(collapsed);
 	}
 
 	async saveSettings() {

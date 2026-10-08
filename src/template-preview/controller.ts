@@ -13,6 +13,10 @@ import {
 	TableFullscreenViewer,
 	bindTableFullscreenButtons,
 } from "./table-fullscreen";
+import {
+	ImageFullscreenViewer,
+	bindImageFullscreenButtons,
+} from "./image-fullscreen";
 
 interface ClipboardWriter {
 	writeText(value: string): Promise<void>;
@@ -38,6 +42,7 @@ export class TemplatePreviewController {
 	private editorSnapshot: { path: string; markdown: string } | null = null;
 	private readonly mermaidFullscreen = new MermaidFullscreenViewer(document.body);
 	private readonly tableFullscreen = new TableFullscreenViewer(document.body);
+	private readonly imageFullscreen = new ImageFullscreenViewer(document.body);
 
 	constructor(
 		private readonly plugin: HtmltoLinkPlugin,
@@ -57,7 +62,15 @@ export class TemplatePreviewController {
 			onPublish: () => {
 				if (this.view.file) void publishNote(this.plugin, this.view.file);
 			},
+			onOpenSite: () => {
+				window.open(this.siteHomeUrl(), "_blank", "noopener,noreferrer");
+			},
+			onCollapsedChange: (collapsed) => {
+				this.plugin.setPreviewToolbarCollapsed(collapsed);
+			},
 		});
+		this.toolbar.setSiteUrl(this.siteHomeUrl());
+		this.toolbar.setCollapsed(this.plugin.settings.previewToolbarCollapsed);
 		this.overlay = this.root.createDiv({ cls: "htmlto-link-template-preview-overlay" });
 		this.iframe = this.overlay.createEl("iframe", {
 			cls: "htmlto-link-template-preview-frame",
@@ -73,6 +86,7 @@ export class TemplatePreviewController {
 			this.bindPreviewToc();
 			this.bindMermaidFullscreen();
 			this.bindTableFullscreen();
+			this.bindImageFullscreen();
 		});
 		this.setPreviewVisible(false);
 	}
@@ -83,6 +97,7 @@ export class TemplatePreviewController {
 		if (this.debounceTimer !== null) window.clearTimeout(this.debounceTimer);
 		this.mermaidFullscreen.destroy();
 		this.tableFullscreen.destroy();
+		this.imageFullscreen.destroy();
 		this.iframe.srcdoc = "";
 		this.root.remove();
 		this.host.removeClass("htmlto-link-template-preview-host");
@@ -122,7 +137,17 @@ export class TemplatePreviewController {
 	}
 
 	focusTemplate(): void {
+		if (this.toolbar.isCollapsed()) this.plugin.setPreviewToolbarCollapsed(false);
 		this.toolbar.focusTemplate();
+	}
+
+	setToolbarCollapsed(collapsed: boolean): void {
+		this.toolbar.setCollapsed(collapsed);
+	}
+
+	private siteHomeUrl(): string {
+		const base = this.plugin.settings.apiBaseUrl.trim().replace(/\/+$/, "");
+		return /^https?:\/\//i.test(base) ? base : "https://htmlto.link";
 	}
 
 	private selectTemplate(templateId: string): void {
@@ -198,6 +223,7 @@ export class TemplatePreviewController {
 			) return;
 			this.mermaidFullscreen.close();
 			this.tableFullscreen.close();
+			this.imageFullscreen.close();
 			this.iframe.srcdoc = srcdoc;
 		} catch (error: unknown) {
 			if (
@@ -208,6 +234,7 @@ export class TemplatePreviewController {
 			const message = error instanceof Error ? error.message : String(error);
 			this.mermaidFullscreen.close();
 			this.tableFullscreen.close();
+			this.imageFullscreen.close();
 			this.iframe.srcdoc = this.buildErrorDocument(message);
 		} finally {
 			if (!this.disposed && token === this.renderToken) this.toolbar.setBusy(false);
@@ -368,6 +395,7 @@ export class TemplatePreviewController {
 			this.toolbar.setValue("", "");
 			this.mermaidFullscreen.close();
 			this.tableFullscreen.close();
+			this.imageFullscreen.close();
 		}
 	}
 
@@ -376,6 +404,7 @@ export class TemplatePreviewController {
 		if (!previewDocument) return;
 		bindMermaidFullscreenButtons(previewDocument, (svg, opener) => {
 			this.tableFullscreen.close();
+			this.imageFullscreen.close();
 			this.mermaidFullscreen.open(svg, opener);
 		});
 	}
@@ -385,7 +414,18 @@ export class TemplatePreviewController {
 		if (!previewDocument) return;
 		bindTableFullscreenButtons(previewDocument, (table, opener) => {
 			this.mermaidFullscreen.close();
+			this.imageFullscreen.close();
 			this.tableFullscreen.open(table, opener);
+		});
+	}
+
+	private bindImageFullscreen(): void {
+		const previewDocument = this.iframe.contentDocument;
+		if (!previewDocument) return;
+		bindImageFullscreenButtons(previewDocument, (image, opener) => {
+			this.mermaidFullscreen.close();
+			this.tableFullscreen.close();
+			this.imageFullscreen.open(image, opener);
 		});
 	}
 }

@@ -50,6 +50,8 @@ export interface HtmltoLinkSettings {
 	showOptionsOnPublish: boolean;
 	/** 已分享笔记保存后，自动 PUT 更新同一链接（默认关闭） */
 	autoUpdateOnSave: boolean;
+	/** 笔记右上角模板条是否收起，避免下拉挡住正文 */
+	previewToolbarCollapsed: boolean;
 	/**
 	 * 按 vault 文件路径缓存已上传图片，文件未变化时直接复用公开 URL
 	 * key = TFile.path
@@ -73,6 +75,7 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	writeShareToNote: true,
 	showOptionsOnPublish: true,
 	autoUpdateOnSave: false,
+	previewToolbarCollapsed: false,
 	uploadedAssets: {},
 	noteShares: {},
 };

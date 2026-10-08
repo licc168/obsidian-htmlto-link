@@ -37,6 +37,12 @@ export class TemplatePreviewManager {
 		for (const controller of this.controllers.values()) controller.handleFileChange(file);
 	}
 
+	setToolbarCollapsed(collapsed: boolean): void {
+		for (const controller of this.controllers.values()) {
+			controller.setToolbarCollapsed(collapsed);
+		}
+	}
+
 	focusActive(): void {
 		const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 		if (!view) return;

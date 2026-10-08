@@ -5,6 +5,7 @@ import {
 	getPreviewThemeClass,
 } from "./registry";
 import { renderMermaidInHtml } from "./mermaid";
+import { wrapPreviewImages } from "./image-fullscreen";
 import { wrapTablesForFullscreen } from "./table-fullscreen";
 import { highlightCodeBlocks } from "./code-highlight";
 import { t } from "../i18n";
@@ -180,8 +181,56 @@ html { scroll-behavior: auto !important; }
   overflow-wrap: normal;
   word-break: normal;
 }
-.htmlto-link-preview-copy-success {
+htmlto-link-preview-copy-success {
   outline: 2px solid #22c55e !important;
+  outline-offset: 2px;
+}
+.share-card-shell .htmlto-link-image-frame {
+  position: relative;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 0.4em 0;
+  line-height: 0;
+}
+.share-card-shell .htmlto-link-image-frame > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  cursor: zoom-in;
+}
+.share-card-shell .htmlto-link-image-zoom-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: #111;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: #fff;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  user-select: none;
+}
+.share-card-shell .htmlto-link-image-zoom-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+.share-card-shell .htmlto-link-image-zoom-btn:hover {
+  background: #000;
+}
+.share-card-shell .htmlto-link-image-zoom-btn:focus-visible {
+  outline: 2px solid #fff;
   outline-offset: 2px;
 }
 `;
@@ -374,7 +423,7 @@ export async function renderLocalTemplatePreview(
 			sanitizeRenderedHtml(highlightedHtml),
 		);
 		const content = addHeadingAnchorsAndBuildToc(
-			addOrderedListIndices(normalizedHtml),
+			wrapPreviewImages(addOrderedListIndices(normalizedHtml)),
 		);
 		const meta = getPreviewTemplateMeta(input.templateId);
 		const themeClass = getPreviewThemeClass(input.templateId, input.themeClass);
