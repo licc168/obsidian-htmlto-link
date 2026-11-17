@@ -9,7 +9,7 @@ Instantly share any Obsidian note as a beautiful webpage via [htmlto.link](https
 - **One-click share** — Ribbon, command palette (`Share current note`), or right-click a file
 - **Same URL on update** — Re-sharing a note updates the existing link; rename or move the file and it still matches
 - **Update on save** — Optional. Already-shared notes update the same URL when you save; the first share is still manual
-- **30+ templates** — Memo, Pop Art, Traditional Chinese, Coil Notebook, Cyberpunk, Glassmorphism, and more
+- **Many templates** — Memo, Pop Art, Traditional Chinese, Coil Notebook, Vintage Newspaper, and more
 - **Theme variants** — Multiple color themes per template (e.g. Bright / Dark for Memo)
 - **Local template preview** — Switch template and theme from the top-right of the current Markdown page without publishing or uploading the note
 - **Responsive layout** — Share pages adapt to screen width automatically

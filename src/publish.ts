@@ -4,6 +4,7 @@ import { createSharePage, deleteSharePage } from "./api";
 import { fingerprintMarkdown } from "./auto-update-core";
 import {
 	type NoteShareRecord,
+	resolveSelectableTemplateId,
 	resolveThemeClassForTemplate,
 } from "./constants";
 import {
@@ -273,10 +274,11 @@ export async function publishNote(
 		return;
 	}
 
+	const templateId = resolveSelectableTemplateId(plugin.settings.templateId);
 	const initial: PublishOptions = {
-		templateId: plugin.settings.templateId,
+		templateId,
 		themeClass: resolveThemeClassForTemplate(
-			plugin.settings.templateId,
+			templateId,
 			plugin.settings.themeClass,
 		),
 	};

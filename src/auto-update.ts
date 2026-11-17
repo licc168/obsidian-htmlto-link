@@ -10,6 +10,7 @@ import {
 	shouldSkipUnchanged,
 } from "./auto-update-core";
 import {
+	resolveSelectableTemplateId,
 	resolveThemeClassForTemplate,
 	type HtmltoLinkSettings,
 	type NoteShareRecord,
@@ -81,7 +82,9 @@ async function autoUpdateSharedNote(
 	const markdown = prepareMarkdown(await plugin.app.vault.read(file));
 	if (shouldSkipUnchanged(record.contentHash, markdown)) return;
 
-	const templateId = record.templateId || plugin.settings.templateId;
+	const templateId = resolveSelectableTemplateId(
+		record.templateId || plugin.settings.templateId,
+	);
 	const themeClass = resolveThemeClassForTemplate(
 		templateId,
 		record.themeClass ?? plugin.settings.themeClass,

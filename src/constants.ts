@@ -97,16 +97,12 @@ export const TEMPLATE_OPTIONS: Array<{ id: string; nameKey: string }> = [
 	{ id: "darktech", nameKey: "tplDarktech" },
 	{ id: "fairytale", nameKey: "tplFairytale" },
 	{ id: "boardgamestyle", nameKey: "tplBoardgame" },
-	{ id: "cyberpunk", nameKey: "tplCyberpunk" },
-	{ id: "glassmorphism", nameKey: "tplGlassmorphism" },
-	{ id: "neonglow", nameKey: "tplNeonglow" },
 	{ id: "vintagenewspaper", nameKey: "tplVintageNewspaper" },
 	{ id: "handwrittennote", nameKey: "tplHandwritten" },
 	{ id: "vintagemap", nameKey: "tplVintageMap" },
 	{ id: "blueprint", nameKey: "tplBlueprint" },
 	{ id: "botanical", nameKey: "tplBotanical" },
 	{ id: "sketch", nameKey: "tplSketch" },
-	{ id: "terminal", nameKey: "tplTerminal" },
 	{ id: "retro", nameKey: "tplRetro" },
 	{ id: "ayulight", nameKey: "tplAyulight" },
 	{ id: "bauhaus", nameKey: "tplBauhaus" },
@@ -119,6 +115,14 @@ export const TEMPLATE_OPTIONS: Array<{ id: string; nameKey: string }> = [
 	{ id: "professional", nameKey: "tplProfessional" },
 	{ id: "plain", nameKey: "tplPlain" },
 ];
+
+const SELECTABLE_TEMPLATE_IDS = new Set(TEMPLATE_OPTIONS.map((item) => item.id));
+
+/** 选择器里没有的旧模板 id 回到简洁。已发布页面在下次更新前仍保持原样。 */
+export function resolveSelectableTemplateId(templateId: string | null | undefined): string {
+	const id = (templateId ?? "").trim();
+	return SELECTABLE_TEMPLATE_IDS.has(id) ? id : "plain";
+}
 
 /**
  * 与网站 templateThemes 对齐。

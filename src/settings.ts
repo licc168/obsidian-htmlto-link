@@ -12,6 +12,7 @@ import {
 	TEMPLATE_OPTIONS,
 	getTemplateThemes,
 	hasMultiThemes,
+	resolveSelectableTemplateId,
 	resolveThemeClassForTemplate,
 	type HtmltoLinkSettings,
 	type PluginLanguage,
@@ -153,6 +154,9 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
+		this.plugin.settings.templateId = resolveSelectableTemplateId(
+			this.plugin.settings.templateId,
+		);
 		// 校正当前模板对应的主题
 		this.plugin.settings.themeClass = resolveThemeClassForTemplate(
 			this.plugin.settings.templateId,

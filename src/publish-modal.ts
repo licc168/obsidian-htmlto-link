@@ -3,6 +3,7 @@ import {
 	TEMPLATE_OPTIONS,
 	getTemplateThemes,
 	hasMultiThemes,
+	resolveSelectableTemplateId,
 	resolveThemeClassForTemplate,
 } from "./constants";
 import { t } from "./i18n";
@@ -44,10 +45,11 @@ export class PublishFlowModal extends Modal {
 		guestWarning?: string,
 	) {
 		super(app);
+		const templateId = resolveSelectableTemplateId(initial.templateId);
 		this.draft = {
-			...initial,
+			templateId,
 			themeClass: resolveThemeClassForTemplate(
-				initial.templateId,
+				templateId,
 				initial.themeClass,
 			),
 		};

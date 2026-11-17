@@ -1,5 +1,10 @@
 import { MarkdownView, Plugin, TFile } from "obsidian";
-import { DEFAULT_SETTINGS, type HtmltoLinkSettings } from "./constants";
+import {
+	DEFAULT_SETTINGS,
+	resolveSelectableTemplateId,
+	resolveThemeClassForTemplate,
+	type HtmltoLinkSettings,
+} from "./constants";
 import { HtmltoLinkSettingTab } from "./settings";
 import {
 	publishActiveNote,
@@ -187,6 +192,27 @@ export default class HtmltoLinkPlugin extends Plugin {
 		}
 		if (typeof this.settings.previewToolbarCollapsed !== "boolean") {
 			this.settings.previewToolbarCollapsed = false;
+		}
+		let retiredTemplate = false;
+		const nextTemplateId = resolveSelectableTemplateId(this.settings.templateId);
+		if (nextTemplateId !== this.settings.templateId) {
+			this.settings.templateId = nextTemplateId;
+			this.settings.themeClass = resolveThemeClassForTemplate(
+				nextTemplateId,
+				this.settings.themeClass,
+			);
+			retiredTemplate = true;
+		}
+		for (const record of Object.values(this.settings.noteShares)) {
+			if (!record?.templateId) continue;
+			const resolved = resolveSelectableTemplateId(record.templateId);
+			if (resolved === record.templateId) continue;
+			record.templateId = resolved;
+			record.themeClass = resolveThemeClassForTemplate(resolved, record.themeClass);
+			retiredTemplate = true;
+		}
+		if (retiredTemplate) {
+			await this.saveSettings();
 		}
 	}
 
