@@ -48,6 +48,10 @@ export interface HtmltoLinkSettings {
 	writeShareToNote: boolean;
 	/** 发布时是否弹出模板/主题选择框 */
 	showOptionsOnPublish: boolean;
+	/** 发布站点：国内 htmlto.cn，国外 htmlto.link */
+	publishRegion: "cn" | "intl";
+	/** 为 false 时不再弹出站点选择，直接用 publishRegion */
+	askPublishRegion: boolean;
 	/** 已分享笔记保存后，自动 PUT 更新同一链接（默认关闭） */
 	autoUpdateOnSave: boolean;
 	/** 笔记右上角模板条是否收起，避免下拉挡住正文 */
@@ -74,6 +78,8 @@ export const DEFAULT_SETTINGS: HtmltoLinkSettings = {
 	openInBrowser: false,
 	writeShareToNote: true,
 	showOptionsOnPublish: true,
+	publishRegion: "intl",
+	askPublishRegion: true,
 	autoUpdateOnSave: false,
 	previewToolbarCollapsed: false,
 	uploadedAssets: {},

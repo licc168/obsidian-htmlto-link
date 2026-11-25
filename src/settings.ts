@@ -18,6 +18,11 @@ import {
 	type PluginLanguage,
 } from "./constants";
 import { t } from "./i18n";
+import {
+	isManagedPublishBase,
+	originForRegion,
+	type PublishRegion,
+} from "./publish-region";
 
 export { DEFAULT_SETTINGS };
 export type { HtmltoLinkSettings };
@@ -111,6 +116,16 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 							});
 						},
 					},
+					{
+						name: t("publishRegionName"),
+						desc: t("publishRegionSettingDesc"),
+						render: (setting) => this.addRegionDropdown(setting, refresh),
+					},
+					this.createToggleDefinition(
+						"askPublishRegionName",
+						"askPublishRegionDesc",
+						"askPublishRegion",
+					),
 					this.createToggleDefinition(
 						"showOptionsName",
 						"showOptionsDesc",
@@ -242,6 +257,23 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 		}
 		// 无多主题时不显示主题选项
 
+		const regionSetting = new Setting(containerEl)
+			.setName(t("publishRegionName"))
+			.setDesc(t("publishRegionSettingDesc"));
+		this.addRegionDropdown(regionSetting, () => this.renderLegacySettings());
+
+		new Setting(containerEl)
+			.setName(t("askPublishRegionName"))
+			.setDesc(t("askPublishRegionDesc"))
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.askPublishRegion)
+					.onChange(async (value) => {
+						this.plugin.settings.askPublishRegion = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
 		new Setting(containerEl)
 			.setName(t("showOptionsName"))
 			.setDesc(t("showOptionsDesc"))
@@ -313,7 +345,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 			howTo.appendText(t("tipTokenHowToPrefix"));
 			howTo.createEl("a", {
 				text: "Htmlto.link settings",
-				href: "https://htmlto.link/settings",
+				href: this.siteSettingsUrl(),
 				attr: { target: "_blank", rel: "noopener noreferrer" },
 			});
 			howTo.appendText(t("tipTokenHowToSuffix"));
@@ -324,13 +356,40 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 		tips.createEl("li", { text: t("tipCommand") });
 	}
 
+	private siteSettingsUrl(): string {
+		const base = this.plugin.settings.apiBaseUrl.trim().replace(/\/+$/, "");
+		const origin =
+			isManagedPublishBase(base) && /^https?:\/\//i.test(base)
+				? base
+				: "https://htmlto.link";
+		return `${origin}/settings`;
+	}
+
+	private addRegionDropdown(setting: Setting, refresh: () => void): void {
+		setting.addDropdown((dropdown) => {
+			dropdown
+				.addOption("cn", t("publishRegionCn"))
+				.addOption("intl", t("publishRegionIntl"))
+				.setValue(this.plugin.settings.publishRegion === "cn" ? "cn" : "intl")
+				.onChange(async (value) => {
+					const region: PublishRegion = value === "cn" ? "cn" : "intl";
+					this.plugin.settings.publishRegion = region;
+					if (isManagedPublishBase(this.plugin.settings.apiBaseUrl)) {
+						this.plugin.settings.apiBaseUrl = originForRegion(region);
+					}
+					await this.plugin.saveSettings();
+					refresh();
+				});
+		});
+	}
+
 	private createTokenDescription(): DocumentFragment {
 		return createFragment((fragment) => {
 			fragment.appendText(t("apiTokenDesc"));
 			fragment.createEl("br");
 			fragment.createEl("a", {
 				text: t("apiTokenHelpLink"),
-				href: "https://htmlto.link/settings",
+				href: this.siteSettingsUrl(),
 				attr: { target: "_blank", rel: "noopener noreferrer" },
 			});
 		});
@@ -357,7 +416,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 					.setIcon("external-link")
 					.setTooltip(t("apiTokenHelpTooltip"))
 					.onClick(() => {
-						window.open("https://htmlto.link/settings", "_blank");
+						window.open(this.siteSettingsUrl(), "_blank");
 					});
 			});
 	}
@@ -366,6 +425,7 @@ export class HtmltoLinkSettingTab extends PluginSettingTab {
 		nameKey: string,
 		descKey: string,
 		settingKey:
+			| "askPublishRegion"
 			| "showOptionsOnPublish"
 			| "copyLinkOnSuccess"
 			| "openInBrowser"

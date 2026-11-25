@@ -13,6 +13,7 @@ import {
 	deleteShareNote,
 } from "./publish";
 import { initI18n, t } from "./i18n";
+import { isPublishRegion, regionFromBaseUrl } from "./publish-region";
 import { AutoUpdateController } from "./auto-update";
 import { handleVaultDelete, handleVaultRename } from "./share-index";
 import { TemplatePreviewManager } from "./template-preview/manager";
@@ -192,6 +193,12 @@ export default class HtmltoLinkPlugin extends Plugin {
 		}
 		if (typeof this.settings.previewToolbarCollapsed !== "boolean") {
 			this.settings.previewToolbarCollapsed = false;
+		}
+		if (!isPublishRegion(this.settings.publishRegion)) {
+			this.settings.publishRegion = regionFromBaseUrl(this.settings.apiBaseUrl);
+		}
+		if (typeof this.settings.askPublishRegion !== "boolean") {
+			this.settings.askPublishRegion = true;
 		}
 		let retiredTemplate = false;
 		const nextTemplateId = resolveSelectableTemplateId(this.settings.templateId);

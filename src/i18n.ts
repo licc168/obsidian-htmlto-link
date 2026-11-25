@@ -22,6 +22,20 @@ const dict = {
     defaultTemplateDesc: "Card template used when publishing.",
     defaultThemeName: "Default theme",
     defaultThemeDesc: "Color theme for the current template.",
+    publishRegionName: "Publish site",
+    publishRegionSettingDesc:
+      "China uses htmlto.cn. International uses htmlto.link.",
+    publishRegionCn: "China (htmlto.cn)",
+    publishRegionIntl: "International (htmlto.link)",
+    publishRegionTitle: "Where should this page be published?",
+    publishRegionDesc:
+      "China publishes to htmlto.cn. International publishes to htmlto.link.",
+    publishRegionRemember: "Remember this choice",
+    publishRegionRememberDesc: "Don't ask again next time. You can change it in settings.",
+    publishRegionContinue: "Continue",
+    askPublishRegionName: "Ask for the site when publishing",
+    askPublishRegionDesc:
+      "When off, publishing uses the site above and skips this question.",
     showOptionsName: "Choose template on publish",
     showOptionsDesc:
       "When enabled, a dialog appears each publish. Your last choice is remembered and used as the default next time.",
@@ -225,6 +239,17 @@ const dict = {
     defaultTemplateDesc: "发布时使用的卡片模板。",
     defaultThemeName: "默认主题",
     defaultThemeDesc: "当前模板支持多种主题配色。",
+    publishRegionName: "发布站点",
+    publishRegionSettingDesc: "中国使用 htmlto.cn，国际使用 htmlto.link。",
+    publishRegionCn: "中国（htmlto.cn）",
+    publishRegionIntl: "国际（htmlto.link）",
+    publishRegionTitle: "发布到哪里？",
+    publishRegionDesc: "中国发布到 htmlto.cn，国际发布到 htmlto.link。",
+    publishRegionRemember: "记住选择，下次不再询问",
+    publishRegionRememberDesc: "记住后直接使用这次的站点。之后可在插件设置里修改。",
+    publishRegionContinue: "继续",
+    askPublishRegionName: "发布时询问站点",
+    askPublishRegionDesc: "关闭后不再弹出选择，直接使用上面的站点。",
     showOptionsName: "发布时选择模板",
     showOptionsDesc:
       "开启后每次发布弹出选择框；选过一次会自动记住，下次默认选中上次的模板。",

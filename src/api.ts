@@ -1,5 +1,6 @@
 import { requestUrl, type RequestUrlResponse } from "obsidian";
 import type { HtmltoLinkSettings } from "./constants";
+import { isManagedPublishBase, shareUrlForRegion } from "./publish-region";
 import { t } from "./i18n";
 import {
 	optionalBoolean,
@@ -128,6 +129,7 @@ async function requestJson(
 }
 
 function finalizeResponse(
+	settings: HtmltoLinkSettings,
 	base: string,
 	status: number,
 	data: CreateShareResponse,
@@ -137,7 +139,11 @@ function finalizeResponse(
 		throw new ApiError(data.error || t("httpFailed") + status + ")", false, status);
 	}
 
-	const url = data.url ?? (data.slug ? `${base}/${data.slug}` : undefined);
+	const rawUrl = data.url ?? (data.slug ? `${base}/${data.slug}` : undefined);
+	const url =
+		rawUrl && isManagedPublishBase(settings.apiBaseUrl)
+			? shareUrlForRegion(rawUrl, settings.publishRegion)
+			: rawUrl;
 	if (!url) {
 		throw new ApiError(t("noUrl"), false);
 	}
@@ -217,7 +223,7 @@ export async function updateSharePage(
 		apiToken,
 	);
 
-	return finalizeResponse(base, status, {
+	return finalizeResponse(settings, base, status, {
 		...data,
 		updateToken: data.updateToken || updateToken,
 		slug: data.slug || slug,
@@ -252,7 +258,7 @@ export async function createSharePage(
 			if (status === 404 || status === 403 || status === 405) {
 				// fall through to create
 			} else {
-				return finalizeResponse(base, status, {
+				return finalizeResponse(settings, base, status, {
 					...data,
 					// 更新成功时服务端可能不回传 token，沿用本地的
 					updateToken: data.updateToken || payload.updateToken,
@@ -278,5 +284,5 @@ export async function createSharePage(
 		apiToken,
 	);
 
-	return finalizeResponse(base, status, data);
+	return finalizeResponse(settings, base, status, data);
 }

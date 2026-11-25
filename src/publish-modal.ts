@@ -7,6 +7,7 @@ import {
 	resolveThemeClassForTemplate,
 } from "./constants";
 import { t } from "./i18n";
+import { type PublishRegion } from "./publish-region";
 
 export interface PublishOptions {
 	templateId: string;
@@ -335,6 +336,79 @@ function renderSuccessContent(
 
 	const closeBtn = actions.createEl("button", { text: t("close") });
 	closeBtn.addEventListener("click", () => onClose());
+}
+
+/** 发布前选择国内或国外。记住之后由调用方不再打开。 */
+export function choosePublishRegion(
+	app: App,
+	initial: PublishRegion,
+): Promise<{ region: PublishRegion; remember: boolean } | null> {
+	return new Promise((resolve) => {
+		let settled = false;
+		const finish = (value: { region: PublishRegion; remember: boolean } | null) => {
+			if (settled) return;
+			settled = true;
+			resolve(value);
+		};
+
+		class RegionModal extends Modal {
+			private region: PublishRegion = initial === "cn" ? "cn" : "intl";
+			private remember = false;
+
+			onOpen() {
+				const { contentEl } = this;
+				contentEl.empty();
+				contentEl.addClass("htmlto-link-publish-modal");
+				contentEl.createEl("h2", { text: t("publishRegionTitle") });
+				contentEl.createEl("p", {
+					text: t("publishRegionDesc"),
+					cls: "setting-item-description",
+				});
+
+				new Setting(contentEl)
+					.setName(t("publishRegionName"))
+					.addDropdown((dropdown) => {
+						dropdown
+							.addOption("cn", t("publishRegionCn"))
+							.addOption("intl", t("publishRegionIntl"))
+							.setValue(this.region)
+							.onChange((value) => {
+								this.region = value === "cn" ? "cn" : "intl";
+							});
+					});
+
+				new Setting(contentEl)
+					.setName(t("publishRegionRemember"))
+					.setDesc(t("publishRegionRememberDesc"))
+					.addToggle((toggle) => {
+						toggle.setValue(this.remember).onChange((value) => {
+							this.remember = value;
+						});
+					});
+
+				const actions = contentEl.createDiv({
+					cls: "htmlto-link-publish-actions",
+				});
+				const cancelBtn = actions.createEl("button", { text: t("cancel") });
+				cancelBtn.addEventListener("click", () => this.close());
+				const continueBtn = actions.createEl("button", {
+					text: t("publishRegionContinue"),
+					cls: "mod-cta",
+				});
+				continueBtn.addEventListener("click", () => {
+					finish({ region: this.region, remember: this.remember });
+					this.close();
+				});
+			}
+
+			onClose() {
+				finish(null);
+				this.contentEl.empty();
+			}
+		}
+
+		new RegionModal(app).open();
+	});
 }
 
 /** 打开一体化发布弹窗（选模板 → 发布 → 成功/失败） */

@@ -8,11 +8,17 @@ import {
 	resolveThemeClassForTemplate,
 } from "./constants";
 import {
+	choosePublishRegion,
 	openPublishFlow,
 	openPublishSuccess,
 	type PublishOptions,
 	type PublishSuccessInfo,
 } from "./publish-modal";
+import {
+	isManagedPublishBase,
+	isPublishRegion,
+	originForRegion,
+} from "./publish-region";
 import { t, timeLocale } from "./i18n";
 import { rewriteLocalImagesForShare } from "./local-images";
 
@@ -274,6 +280,9 @@ export async function publishNote(
 		return;
 	}
 
+	const ready = await ensurePublishRegion(plugin);
+	if (!ready) return;
+
 	const templateId = resolveSelectableTemplateId(plugin.settings.templateId);
 	const initial: PublishOptions = {
 		templateId,
@@ -307,6 +316,35 @@ export async function publishNote(
 		const message = err instanceof Error ? err.message : String(err);
 		new Notice(t("publishFailed") + message, 10000);
 	}
+}
+
+/**
+ * 官方站点才询问国内/国外。记住之后直接使用上次的站点。
+ * 取消则中止这次发布。
+ */
+async function ensurePublishRegion(plugin: HtmltoLinkPlugin): Promise<boolean> {
+	if (!isManagedPublishBase(plugin.settings.apiBaseUrl)) return true;
+
+	if (!plugin.settings.askPublishRegion && isPublishRegion(plugin.settings.publishRegion)) {
+		const next = originForRegion(plugin.settings.publishRegion);
+		if (plugin.settings.apiBaseUrl.replace(/\/+$/, "") !== next) {
+			plugin.settings.apiBaseUrl = next;
+			await plugin.saveSettings();
+		}
+		return true;
+	}
+
+	const choice = await choosePublishRegion(
+		plugin.app,
+		plugin.settings.publishRegion === "cn" ? "cn" : "intl",
+	);
+	if (!choice) return false;
+
+	plugin.settings.publishRegion = choice.region;
+	plugin.settings.apiBaseUrl = originForRegion(choice.region);
+	if (choice.remember) plugin.settings.askPublishRegion = false;
+	await plugin.saveSettings();
+	return true;
 }
 
 /**
